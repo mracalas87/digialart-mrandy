@@ -115,6 +115,26 @@ input{-webkit-user-select:text;user-select:text}
 #intro-text{font-family:"Andika","Nunito",ui-rounded,system-ui,sans-serif;font-size:1.6rem;line-height:1.35;margin:0 0 6px;text-wrap:balance}
 #intro .row{justify-content:center}
 #intro-go{font-family:var(--display);font-size:1.4rem;padding:0 30px}
+
+#mixer{position:fixed;inset:0;z-index:11;background:rgba(15,25,40,.6);display:flex;align-items:center;justify-content:center;padding:12px}
+#mixer .sheet{width:min(100%,560px);text-align:center;gap:8px}
+#mixer h2{font-family:var(--display);font-size:2rem;line-height:1;margin:0}
+#mix-task{font-family:"Andika","Nunito",ui-rounded,system-ui,sans-serif;font-size:1.4rem;line-height:1.3;margin:0;text-wrap:balance;min-height:2.6em}
+#mix-want{display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--display);font-size:1.5rem}
+#mix-chip{width:34px;height:34px;border-radius:50%;border:3px solid var(--fg);display:inline-block}
+.mix-src{display:flex;justify-content:center;gap:12px}
+.mix-src button{display:flex;flex-direction:column;align-items:center;gap:0;background:var(--btn);border-radius:18px;padding:6px 8px 4px;flex:1;max-width:150px;font-family:var(--display);font-size:1.25rem;line-height:1.2}
+.mix-src button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.mix-src button:disabled{opacity:.45;cursor:default}
+.mix-src svg{width:100%;height:auto;display:block}
+#mix-bowl{display:flex;justify-content:center}
+#mix-bowl svg{width:min(190px,48%);height:auto}
+#mix-says{font-family:var(--display);font-size:1.55rem;line-height:1.15;min-height:1.2em;margin:0}
+#mix-shelf{display:flex;justify-content:center;gap:8px;min-height:44px}
+#mix-shelf svg{width:54px;height:auto;display:block}
+#mixer .row{justify-content:center;flex-wrap:wrap}
+#mix-next{font-family:var(--display);font-size:1.35rem;padding:0 26px}
+@media (max-height:760px){#mixer h2{font-size:1.6rem}#mix-task{font-size:1.2rem;min-height:0}#mix-bowl svg{width:130px}#mix-shelf svg{width:40px}}
 @media (prefers-reduced-motion:reduce){.card:active{transform:none}}
 #namer{align-items:flex-start}
 #namer .sheet{width:min(100%,460px)}
@@ -137,6 +157,7 @@ input{-webkit-user-select:text;user-select:text}
   .tool{width:68px;min-height:58px;font-size:.7rem;padding:4px 2px}
   .tool svg.s{width:34px;height:34px}
   .sw{width:46px;height:46px;min-height:0}
+  #swatches.many .sw{width:40px;height:40px}
   .pill{padding:0 12px;gap:6px}
   .modes{flex-wrap:wrap;justify-content:center}
   .modes button{padding:0 9px;font-size:1rem;min-height:44px;gap:5px}
@@ -241,6 +262,10 @@ input{-webkit-user-select:text;user-select:text}
       <button class="tool" id="cs-50" aria-pressed="true"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="currentColor"/></svg>Middle</button>
       <button class="tool" id="cs-90" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/></svg>Big</button>
     </div>
+    <h2>Paint pots</h2>
+    <div class="grid g2">
+      <button class="tool" id="mix-open"><svg class="i" viewBox="0 0 24 24"><path d="M3.500 10h17c0 6-3 9.500-8.500 9.500S3.500 16 3.500 10z"/><ellipse cx="12" cy="10" rx="8.500" ry="2.200"/><path d="M12 2.500v3.500"/></svg>Mix</button>
+    </div>
   </section>
   <section class="panel" id="left-patterns" aria-label="How much is coloured" hidden>
     <h2>Coloured in</h2>
@@ -286,6 +311,27 @@ input{-webkit-user-select:text;user-select:text}
   <p class="s">Hold it tall, like a book.</p>
 </div>
 
+<div id="mixer" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="mix-title">
+    <h2 id="mix-title">Mix your paint</h2>
+    <p id="mix-task"></p>
+    <div id="mix-want" hidden><span>Make</span><i id="mix-chip"></i><b id="mix-want-name"></b></div>
+    <div class="mix-src" id="mix-src"></div>
+    <div id="mix-bowl"></div>
+    <p id="mix-says"></p>
+    <div class="row">
+      <button class="pill" id="mix-say"><svg class="i" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.500 8.500a5 5 0 010 7M19 6a8.500 8.500 0 010 12"/></svg>Read it to me</button>
+      <button class="pill" id="mix-empty">Empty the pot</button>
+      <button class="pill go" id="mix-next" hidden>Next</button>
+    </div>
+    <div id="mix-shelf" aria-label="Your mixed pots"></div>
+    <div class="row">
+      <button class="pill" id="mix-home">Home</button>
+      <button class="pill" id="mix-close" hidden>Back to painting</button>
+    </div>
+  </div>
+</div>
+
 <div id="intro" hidden>
   <div class="sheet" role="dialog" aria-labelledby="intro-name">
     <div id="intro-art"></div>
@@ -317,7 +363,7 @@ input{-webkit-user-select:text;user-select:text}
 (function(){
 const $=id=>document.getElementById(id);
 const COLOURS=[['Red','#e53935'],['Orange','#fb8c00'],['Yellow','#fdd835'],['Light green','#7cb342'],['Dark green','#2e7d32'],['Light blue','#4fc3f7'],['Blue','#1e63d0'],['Purple','#8e44ad'],['Pink','#f48fb1'],['Brown','#8d5a3b'],['Black','#1c1c1c'],['White','#ffffff']];
-let colour=COLOURS[0][1], mode='shapes';
+let colour=COLOURS[0][1], mode='shapes', mixed=false;
 
 /* ---------- shape library: each drawn around 0,0 ---------- */
 const star=(()=>{let p=[];for(let i=0;i<10;i++){const r=i%2?23:55,a=Math.PI*i/5-Math.PI/2;p.push((r*Math.cos(a)).toFixed(1)+','+(r*Math.sin(a)).toFixed(1));}return p.join(' ');})();
@@ -380,6 +426,16 @@ const PT=[
  ['Star',['...YY...','...YY...','YYYYYYYY','.YYYYYY.','..YYYY..','.YYYYYY.','.YY..YY.','YY....YY']],
  ['Duck',['..YYY...','.YXYY...','OOYYY...','..YYY..Y','.YYYYYYY','.YYYYYYY','..YYYYY.','...O.O..']],
  ['Car',['........','..BBBB..','.BCBBCB.','RRRRRRRR','RRRRRRRR','.XX..XX.','.XX..XX.','........']],
+ ['Penguin',['..XXXX..','.XWXXWX.','.XXOOXX.','XXWWWWXX','XXWWWWXX','.XWWWWX.','..XXXX..','..O..O..']],
+ ['Ice cream',['...RR...','..KKKK..','.KKKKKK.','KKKKKKKK','.OOOOOO.','..OOOO..','...OO...','...OO...']],
+ ['Butterfly',['..X..X..','PP.XX.PP','PPPXXPPP','PKPXXPKP','PKPXXPKP','PPPXXPPP','.PPXXPP.','..PXXP..']],
+ ['Owl',['N......N','NNNNNNNN','NWWNNWWN','NWXNNXWN','NNNOONNN','.NWWWWN.','.NWWWWN.','..O..O..']],
+ ['Ladybird',['..XXXX..','.RRXXRR.','RXRXXRXR','RRRXXRRR','RRRXXRRR','RXRXXRXR','.RRXXRR.','..RXXR..']],
+ ['Cupcake',['...RR...','..KKKK..','.KKKKKK.','KKKKKKKK','NNNNNNNN','.BCBCBC.','.BCBCBC.','..BCBC..']],
+ ['Frog',['.GG..GG.','GWXGGWXG','GGGGGGGG','GXXXXXXG','GGGRRGGG','GGGGGGGG','.GGGGGG.','GG....GG']],
+ ['Sun',['O..YY..O','.O.YY.O.','..YYYY..','YYYYYYYY','YYYYYYYY','..YYYY..','.O.YY.O.','O..YY..O']],
+ ['Strawberry',['..GGGG..','...GG...','.RRRRRR.','RRYRRYRR','RRRRRRRR','.RYRRYR.','..RRRR..','...RR...']],
+ ['Robot',['...RR...','.BBBBBB.','BYYBBYYB','BYYBBYYB','BBBBBBBB','BXXXXXXB','.BBBBBB.','..B..B..']],
  ['Portugal',['........','DDDRRRRR','DDDRRRRR','DDYYRRRR','DDYYRRRR','DDDRRRRR','DDDRRRRR','........']],
  ['France',['........','BBBWWRRR','BBBWWRRR','BBBWWRRR','BBBWWRRR','BBBWWRRR','BBBWWRRR','........']],
  ['Germany',['........','XXXXXXXX','XXXXXXXX','RRRRRRRR','RRRRRRRR','YYYYYYYY','YYYYYYYY','........']],
@@ -573,7 +629,7 @@ const LETTERS='abcdefghijklmnopqrstuvwxyz'.split('').map(ch=>{
   return [ch,h,T(300,430,440,'#586a86')];
 });
 const PENL=DT.concat(LETTERS),PAINTL=DT.concat(PATS);
-const GROUPS={shapes:[[0,'Pictures'],[15,'Flags']],pixels:[[0,'Pictures'],[14,'Flags']],pen:[[0,'Pictures'],[DT.length,'Letters']],paint:[[0,'Pictures'],[DT.length,'Patterns']],patterns:[]};
+const GROUPS={shapes:[[0,'Pictures'],[15,'Flags']],pixels:[[0,'Pictures'],[24,'Flags']],pen:[[0,'Pictures'],[DT.length,'Letters']],paint:[[0,'Pictures'],[DT.length,'Patterns']],patterns:[[0,'Patterns'],[12,'Trickier patterns']]};
 let guideD=-1;
 
 /* ---------- PEN MODE ---------- */
@@ -648,7 +704,7 @@ $('ct-brush').onclick=()=>setC('brush');$('ct-rubber').onclick=()=>setC('rubber'
 /* each pattern is a list of closed pieces, drawn back to front */
 const FT=(()=>{
   const PD=d=>'<path d="'+d+'"',CC=(x,y,r)=>'<circle cx="'+x+'" cy="'+y+'" r="'+r+'"',RR=(x,y,w,h)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'"',PG=q=>'<polygon points="'+q.map(a=>a[0].toFixed(1)+','+a[1].toFixed(1)).join(' ')+'"';
-  const BG=RR(0,0,600,600),pol=(r,a)=>[300+r*Math.cos(a),300+r*Math.sin(a)],f1=v=>v.toFixed(1);
+  const pol2=(x,y,r,a)=>[x+r*Math.cos(a),y+r*Math.sin(a)],BG=RR(0,0,600,600),pol=(r,a)=>[300+r*Math.cos(a),300+r*Math.sin(a)],f1=v=>v.toFixed(1);
   function wheel(radii,counts,stagger){
     const out=[BG];
     for(let i=counts.length-1;i>=0;i--){
@@ -674,6 +730,37 @@ const FT=(()=>{
    for(let j=0;j<6;j++)for(let i=0;i<6;i++){const a=g[j][i],b=g[j][i+1],c=g[j+1][i+1],d=g[j+1][i];if((i+j)%2)o.push(PG([a,b,c]),PG([a,c,d]));else o.push(PG([a,b,d]),PG([b,c,d]));}list.push(['Stained glass',o]);}
   {const o=[BG];for(let row=13;row>=0;row--)for(let x=(row%2?0:50);x<=650;x+=100)o.push(CC(x,row*50-20,50));list.push(['Scales',o]);}
   {const o=[];for(let r=0;r<10;r++)for(let x=(r%2?-60:0);x<600;x+=120){o.push(RR(x,r*60,120,60),RR(x+22,r*60+14,76,32));}list.push(['Bricks',o]);}
+
+  /* ---- trickier patterns ---- */
+  const hp='M0,45 C-60,5 -50,-45 -22,-45 C-8,-45 0,-35 0,-25 C0,-35 8,-45 22,-45 C50,-45 60,5 0,45 Z';
+  {const o=[];for(let r=0;r<3;r++)for(let c=0;c<3;c++){const x=c*200,y=r*200,cx=x+100,cy=y+100;
+    o.push(RR(x,y,200,200),PG([[cx,y],[x+200,cy],[cx,y+200],[x,cy]]),RR(cx-50,cy-50,100,100),PG([[cx,cy-50],[cx+50,cy],[cx,cy+50],[cx-50,cy]]),RR(cx-25,cy-25,50,50),CC(cx,cy,14));}
+   list.push(['Nested squares',o]);}
+  {const o=[];for(let r=0;r<3;r++)for(let c=0;c<3;c++){const x=c*200,y=r*200,cx=x+100,cy=y+100;o.push(RR(x,y,200,200));
+    for(let k=0;k<8;k++){const a=k*45,t=a*Math.PI/180,px=cx+56*Math.cos(t),py=cy+56*Math.sin(t);o.push('<ellipse cx="'+f1(px)+'" cy="'+f1(py)+'" rx="38" ry="17" transform="rotate('+a+' '+f1(px)+' '+f1(py)+')"');}
+    o.push(CC(cx,cy,24));}
+   list.push(['Flower tiles',o]);}
+  {const o=[];for(let r=0;r<4;r++)for(let c=0;c<4;c++){const x=c*150,y=r*150,m=[x+75,y+75],E=[x+75,y],F=[x+150,y+75],G=[x+75,y+150],H=[x,y+75],A=[x,y],B=[x+150,y],Cc=[x+150,y+150],D=[x,y+150];
+    o.push(PG([A,E,m]),PG([E,B,m]),PG([B,F,m]),PG([F,Cc,m]),PG([Cc,G,m]),PG([G,D,m]),PG([D,H,m]),PG([H,A,m]),CC(m[0],m[1],12));}
+   list.push(['Pinwheels',o]);}
+  {const o=[],R=75,w=R*Math.sqrt(3);for(let row=-1;row<=6;row++)for(let col=-1;col<=5;col++){const cx=col*w+(row%2?w/2:0),cy=row*R*1.5,v=[];if(cx<-w/2||cx>600+w/2||cy<-R||cy>600+R)continue;for(let i=0;i<6;i++){const a=Math.PI/3*i-Math.PI/2;v.push([cx+R*Math.cos(a),cy+R*Math.sin(a)]);}
+    o.push(PG([[cx,cy],v[0],v[1],v[2]]),PG([[cx,cy],v[2],v[3],v[4]]),PG([[cx,cy],v[4],v[5],v[0]]));}
+   list.push(['Tumbling blocks',o]);}
+  {const o=[];for(let r=0;r<4;r++)for(let c=0;c<4;c++){const x=c*150,y=r*150,cx=x+75,cy=y+78,T=s=>' transform="translate('+cx+' '+cy+') scale('+s+')"';
+    o.push(RR(x,y,150,150),'<path d="'+hp+'"'+T(1.12),'<path d="'+hp+'"'+T(.74),'<path d="'+hp+'"'+T(.38));}
+   list.push(['Hearts',o]);}
+  {const o=[];for(let r=0;r<8;r++){const yb=(r+1)*75;for(let c=-1;c<5;c++){const cx=c*150+(r%2?0:75);if(cx<-40||cx>640)continue;
+    o.push(RR(cx-75,yb-75,150,75));[75,50,25].forEach(q=>o.push('<path d="M'+(cx-q)+','+yb+' A'+q+','+q+' 0 0 1 '+(cx+q)+','+yb+' Z"'));}}
+   list.push(['Rainbow arches',o]);}
+  {const o=[];for(let base=-100;base<600;base+=60)for(let j=0;j<12;j++){const x0=j*50,x1=x0+50,t0=j%2?50:0,t1=j%2?0:50;o.push(PG([[x0,base+t0],[x1,base+t1],[x1,base+t1+60],[x0,base+t0+60]]));}
+   list.push(['Chevrons',o]);}
+  {const o=[];for(let r=0;r<6;r++)for(let c=0;c<6;c++){const x=c*100,y=r*100,s=100/3;for(let i=0;i<3;i++)o.push((r+c)%2?RR(x,f1(y+i*s),100,f1(s)):RR(f1(x+i*s),y,f1(s),100));}
+   list.push(['Basket weave',o]);}
+  {const o=[];for(let r=0;r<3;r++)for(let c=0;c<3;c++){const x=c*200,y=r*200,cx=x+100,cy=y+100,oc=[];o.push(RR(x,y,200,200));
+    for(let k=0;k<8;k++){const a=k*Math.PI/4,A=pol2(cx,cy,44,a-Math.PI/8),B=pol2(cx,cy,92,a),Cc=pol2(cx,cy,44,a+Math.PI/8);o.push(PG([A,B,Cc]));oc.push(Cc);}
+    o.push(PG(oc),CC(cx,cy,16));}
+   list.push(['Compass stars',o]);}
+  {const o=[],W=[110,40,60,40,50,110,40,60,40,50];let y=0;W.forEach(h=>{let x=0;W.forEach(w=>{o.push(RR(x,y,w,h));x+=w;});y+=h;});list.push(['Tartan',o]);}
   return list;
 })();
 const pat=$('pat');
@@ -710,6 +797,7 @@ function setMode(m){
   ['pixels','shapes','pen','paint','patterns'].forEach(k=>{$('left-'+k).hidden=k!==m;});
   svg.toggleAttribute('hidden',m!=='shapes');cv.hidden=m!=='pixels';pen.hidden=m!=='pen';pc.hidden=m!=='paint';pat.toggleAttribute('hidden',m!=='patterns');$('shape-actions').hidden=m!=='shapes';
   $('tool-name').textContent=INFO[m][0];
+  document.querySelectorAll('.mixsw').forEach(b=>{b.hidden=!(m==='paint'&&mixed);});$('swatches').classList.toggle('many',m==='paint'&&mixed);
   resetClear();applyLock();refresh();
 }
 function refresh(){
@@ -789,7 +877,7 @@ const INFO={
   pixels:['Pixels','Pictures on a screen are made of tiny squares. Each square is called a pixel.'],
   shapes:['Shapes','Computers can make pictures out of shapes. These are called vector pictures.'],
   pen:['Pen','A touchscreen can feel where your finger goes. That is how you can draw on it.'],
-  paint:['Paint','Every colour on a screen is made from red, green and blue light. When you paint, the computer mixes them for you.'],
+  paint:['Paint','Every colour on a screen is made from red, green and blue light. First, mix some colours in the pots. Then you can paint.'],
   patterns:['Patterns','A pattern that repeats is called a repeating loop in computing. Computers use loops to do the same thing again and again.']
 };
 const ART={
@@ -807,7 +895,7 @@ const ART={
 })();
 function view(work){document.body.classList.toggle('at-home',!work);$('home').hidden=work;$('bar').hidden=!work;$('work').hidden=!work;}
 function closeChallenge(){stopSpeech();$('challenge').hidden=true;$('challenge-btn').setAttribute('aria-pressed','false');}
-function goHome(){closeChallenge();$('intro').hidden=true;view(false);}
+function goHome(){closeChallenge();$('intro').hidden=true;$('mixer').hidden=true;stopSpeech();view(false);}
 function openTool(k){
   closeChallenge();view(true);setMode(k);
   $('intro-art').innerHTML=ART[k];$('intro-name').textContent=INFO[k][0];$('intro-text').textContent=INFO[k][1];
@@ -816,7 +904,7 @@ function openTool(k){
 MODES.forEach(k=>$('mode-'+k).onclick=()=>openTool(k));
 $('home-challenge').onclick=()=>{view(true);newChallenge(true);};
 $('home-btn').onclick=goHome;
-$('intro-go').onclick=()=>{stopSpeech();$('intro').hidden=true;};
+$('intro-go').onclick=()=>{stopSpeech();$('intro').hidden=true;needMix();};
 $('intro-say').onclick=()=>say($('intro-text').textContent);
 
 /* challenges: a random task, for this tool or (from Home) for any tool */
@@ -834,7 +922,7 @@ function newChallenge(any){
   chLast=t;stopSpeech();
   if(m==='shapes')guideS=-1;else if(m==='pixels')guideP=-1;else if(m==='pen')guideD=-1;else if(m==='paint'){guideC=-1;}
   $('ch-mode').textContent={shapes:'Shapes',pixels:'Pixels',pen:'Pen',paint:'Paint',patterns:'Patterns'}[m];$('ch-text').textContent=t;
-  $('challenge').hidden=false;$('challenge-btn').setAttribute('aria-pressed','true');setMode(m);
+  $('challenge').hidden=false;$('challenge-btn').setAttribute('aria-pressed','true');setMode(m);needMix();
 }
 /* read aloud, where the device offers speech */
 const canSpeak='speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';
@@ -872,6 +960,84 @@ $('lock').addEventListener('click',()=>{
   if(skipClick){skipClick=false;return;}
   if(!locked){locked=true;applyLock();}
 });
+/* ---------- PAINT MIXER: the screen makes every colour from red, green and blue light ---------- */
+const MIXNAME={r:'Red',g:'Green',b:'Blue',rg:'Yellow',gb:'Light blue',rb:'Pink',rgb:'White'};
+const MIXHEX={r:'#ff0000',g:'#00ff00',b:'#0000ff',rg:'#ffff00',gb:'#00ffff',rb:'#ff00ff',rgb:'#ffffff'};
+const MIXSTEPS=[
+  {k:'rg',task:'Mix yellow. Tap the red pot and the green pot.'},
+  {k:'gb',task:'Now mix light blue.'},
+  {k:'rb',task:'Now mix pink.'},
+  {k:'rgb',task:'Last one. Mix white. Use all three pots.'}
+];
+const MIX={r:0,g:0,b:0,stage:-1,seen:{},won:false,done:[]};
+const potSvg=(fill,small)=>'<svg viewBox="0 0 120 90" aria-hidden="true"><path d="M14,34 H106 Q106,82 60,82 Q14,82 14,34Z" fill="'+fill+'" stroke="#1c2a44" stroke-width="5" stroke-linejoin="round"/><ellipse cx="60" cy="34" rx="46" ry="11" fill="'+fill+'" stroke="#1c2a44" stroke-width="5"/></svg>';
+const mixKey=()=>(MIX.r?'r':'')+(MIX.g?'g':'')+(MIX.b?'b':'');
+function mixSays(){
+  const k=mixKey();if(!k)return 'The pot is empty.';
+  if(k.length===1)return MIXNAME[k]+' light';
+  return k.split('').map(c=>MIXNAME[c]).join(' + ')+' = '+MIXNAME[k];
+}
+function mixDraw(){
+  const k=mixKey();
+  ['r','g','b'].forEach(c=>{const b=$('mix-'+c);b.setAttribute('aria-pressed',!!MIX[c]);b.disabled=MIX.won;});
+  $('mix-bowl').innerHTML=potSvg(k?MIXHEX[k]:'#eef3f6');
+  $('mix-says').textContent=mixSays();
+  $('mix-shelf').innerHTML=MIX.done.map(k=>potSvg(MIXHEX[k])).join('');
+  const last=MIX.stage===MIXSTEPS.length-1,intro=MIX.stage<0;
+  $('mix-next').hidden=intro?!(MIX.seen.r&&MIX.seen.g&&MIX.seen.b):!MIX.won;
+  $('mix-next').textContent=intro?"Let's mix!":last?'Start painting':'Next pot';
+  $('mix-empty').hidden=MIX.won;
+}
+function mixStage(s){
+  MIX.stage=s;MIX.r=MIX.g=MIX.b=0;MIX.won=false;stopSpeech();
+  const intro=s<0;
+  $('mix-task').textContent=intro?'Screens make every colour from three lights: red, green and blue. Tap each pot to meet it.':MIXSTEPS[s].task;
+  $('mix-want').hidden=intro;
+  if(!intro){$('mix-chip').style.background=MIXHEX[MIXSTEPS[s].k];$('mix-want-name').textContent=MIXNAME[MIXSTEPS[s].k];}
+  mixDraw();
+}
+function showMix(){
+  MIX.done=[];MIX.seen={};
+  $('mix-close').hidden=!mixed;$('mix-home').hidden=locked;
+  $('mixer').hidden=false;mixStage(mixed?0:-1);
+}
+function needMix(){if(mode==='paint'&&!mixed)showMix();}
+function tapPot(c){
+  if(MIX.won)return;
+  MIX[c]=MIX[c]?0:1;
+  if(MIX.stage<0){MIX.seen[c]=true;if(MIX[c])say(MIXNAME[c]);}
+  else if(mixKey()===MIXSTEPS[MIX.stage].k){
+    MIX.won=true;MIX.done.push(MIXSTEPS[MIX.stage].k);
+    say('Yes! '+MIXNAME[mixKey()]);
+  }
+  mixDraw();
+  if(MIX.won)$('mix-says').textContent='Yes! '+mixSays();
+}
+function addMixSwatches(){
+  if(document.querySelector('.mixsw'))return;
+  [['Yellow light','#ffff00'],['Light blue light','#00ffff'],['Pink light','#ff00ff']].forEach(([name,hex],i)=>{
+    const b=document.createElement('button');b.className='sw mixsw';b.hidden=true;b.style.background=hex;b.setAttribute('aria-label',name);b.setAttribute('aria-pressed','false');
+    b.onclick=()=>{colour=hex;document.querySelectorAll('.sw').forEach(s=>s.setAttribute('aria-pressed',s===b));if(ctool==='rubber')setC('brush');};
+    $('swatches').appendChild(b);
+  });
+}
+(function buildMix(){
+  let h='';[['r','Red','#ff0000'],['g','Green','#00ff00'],['b','Blue','#0000ff']].forEach(([c,n,hex])=>{h+='<button id="mix-'+c+'" aria-pressed="false" aria-label="'+n+' light pot">'+potSvg(hex)+n+'</button>';});
+  $('mix-src').innerHTML=h;
+  ['r','g','b'].forEach(c=>$('mix-'+c).onclick=()=>tapPot(c));
+  $('mix-empty').onclick=()=>{if(MIX.won)return;MIX.r=MIX.g=MIX.b=0;mixDraw();};
+  $('mix-next').onclick=()=>{
+    if(MIX.stage<0)mixStage(0);
+    else if(!MIX.won)return;
+    else if(MIX.stage<MIXSTEPS.length-1)mixStage(MIX.stage+1);
+    else{mixed=true;addMixSwatches();stopSpeech();$('mixer').hidden=true;setMode('paint');}
+  };
+  $('mix-say').hidden=!canSpeak;
+  $('mix-say').onclick=()=>say($('mix-task').textContent);
+  $('mix-home').onclick=goHome;
+  $('mix-close').onclick=()=>{stopSpeech();$('mixer').hidden=true;};
+  $('mix-open').onclick=showMix;
+})();
 /* a link ending in #pixels, #shapes, #pen, #paint or #patterns opens on that tool, already locked */
 const startMode=(location.hash||'').slice(1).toLowerCase();
 if(MODES.includes(startMode)){locked=true;openTool(startMode);}else{setMode('shapes');goHome();}
@@ -907,5 +1073,6 @@ document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length
   window.addEventListener('orientationchange',function(){setTimeout(resetZoom,150);});
 })();
 </script>
+
 </body>
 </html>
