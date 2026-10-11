@@ -7,6 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Digital Art Tools">
 <meta name="description" content="Pixels, shapes, pen, paint and patterns: digital art tools for Year 1.">
+<meta http-equiv="Content-Security-Policy" content="connect-src 'none'; form-action 'none'">
 <title>Digital Art Tools</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@700;800&family=Andika:wght@400;700&display=swap">
 <style>
@@ -215,6 +216,22 @@ body.assessing #left-pixels h2:nth-of-type(2),body.assessing #left-pixels .grid:
 .as-star{min-width:90px;text-align:right}
 #asr-rows{display:flex;flex-direction:column;gap:8px}
 @media (max-height:760px){#asmenu h2,#asresult h2{font-size:1.6rem}.as-tile svg{max-width:90px}}
+/* portrait (selfie) */
+body.assessing #left-pixels h2:nth-of-type(3),body.assessing #left-pixels .grid:nth-of-type(3){display:none}
+#swatches.skin{gap:6px}
+#swatches.skin .sw{width:36px;height:36px;min-height:0}
+#cam{position:fixed;inset:0;z-index:13;background:rgba(15,25,40,.7);display:flex;align-items:center;justify-content:center;padding:12px}
+#cam .sheet{width:min(100%,520px);text-align:center;gap:10px}
+#cam h2{font-family:var(--display);font-size:2rem;line-height:1;margin:0}
+#cam-msg{font-family:"Andika","Nunito",ui-rounded,system-ui,sans-serif;font-size:1.25rem;line-height:1.3;margin:0;text-wrap:balance}
+#cam-note{display:flex;align-items:center;justify-content:center;gap:8px;margin:0;padding:8px 12px;border-radius:12px;background:var(--btn);font-family:"Andika","Nunito",ui-rounded,system-ui,sans-serif;font-weight:700;font-size:1rem;line-height:1.25;text-align:left}
+#cam-note svg{flex:none}
+#cam-view{position:relative;width:min(100%,420px);aspect-ratio:1;margin:0 auto;border-radius:18px;overflow:hidden;background:#000}
+#cam-video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
+#cam-view i{position:absolute;left:22%;right:22%;top:10%;bottom:14%;border:4px dashed rgba(255,255,255,.9);border-radius:50%;pointer-events:none}
+#cam-prev{width:min(100%,320px);aspect-ratio:1;margin:0 auto;display:block;border-radius:12px;image-rendering:pixelated}
+#cam .row{justify-content:center;flex-wrap:wrap}
+#cam-snap,#cam-use,#cam-open{font-family:var(--display);font-size:1.35rem;padding:0 26px}
 /* portrait only on touch screens: sideways, a full-screen message asks for the iPad to be turned upright */
 #turn{display:none}
 @media (orientation:landscape) and (pointer:coarse){
@@ -284,6 +301,10 @@ body.assessing #left-pixels h2:nth-of-type(2),body.assessing #left-pixels .grid:
     <div class="grid g2">
       <button class="tool" id="grid-8" aria-pressed="true"><svg class="i" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM12 4v16M4 12h16"/></svg>Big</button>
       <button class="tool" id="grid-16" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM8 4v16M12 4v16M16 4v16M4 8h16M4 12h16M4 16h16"/></svg>Small</button>
+    </div>
+    <h2>Portrait</h2>
+    <div class="grid g2">
+      <button class="tool" id="selfie-btn"><svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.500"/></svg>Selfie</button>
     </div>
   </section>
   <section class="panel" id="left-pen" aria-label="Pen tools" hidden>
@@ -361,6 +382,24 @@ body.assessing #left-pixels h2:nth-of-type(2),body.assessing #left-pixels .grid:
   <p class="s">Hold it tall, like a book.</p>
 </div>
 
+<div id="cam" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="cam-title">
+    <h2 id="cam-title">Portrait</h2>
+    <p id="cam-msg"></p>
+    <p id="cam-note"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>Your photo stays on this iPad. It is not saved. It is not sent to the website or anywhere else.</p>
+    <div id="cam-view" hidden><video id="cam-video" playsinline muted autoplay></video><i></i></div>
+    <canvas id="cam-prev" width="256" height="256" hidden aria-label="Your pixel guide"></canvas>
+    <div class="row">
+      <button class="pill go" id="cam-hold">Teacher: hold to allow the camera</button>
+      <button class="pill go" id="cam-open" hidden>Open camera</button>
+      <button class="pill go" id="cam-snap" hidden>Take photo</button>
+      <button class="pill go" id="cam-use" hidden>Use it</button>
+      <button class="pill" id="cam-retry" hidden>Try again</button>
+      <button class="pill" id="cam-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div id="asmenu" hidden>
   <div class="sheet" role="dialog" aria-labelledby="asm-title">
     <h2 id="asm-title">Assessment</h2>
@@ -436,6 +475,7 @@ body.assessing #left-pixels h2:nth-of-type(2),body.assessing #left-pixels .grid:
 <script>
 (function(){
 const $=id=>document.getElementById(id);
+const SKIN=[['Skin 1','#fde0cc'],['Skin 2','#f1c9a0'],['Skin 3','#d29a68'],['Skin 4','#9c6a43'],['Skin 5','#5a3825']];
 const COLOURS=[['Red','#e53935'],['Orange','#fb8c00'],['Yellow','#fdd835'],['Light green','#7cb342'],['Dark green','#2e7d32'],['Light blue','#4fc3f7'],['Blue','#1e63d0'],['Purple','#8e44ad'],['Pink','#f48fb1'],['Brown','#8d5a3b'],['Black','#1c1c1c'],['White','#ffffff']];
 let colour=COLOURS[0][1], mode='shapes', mixed=false, AS={on:false};
 
@@ -604,9 +644,11 @@ Object.keys(LIB).forEach(t=>{
 
 /* ---------- PIXEL MODE ---------- */
 const cv=$('cv'),ctx=cv.getContext('2d');
-let N=8,cells=new Array(64).fill(null),undoP=[],ptool='pencil',painting=false;
+let N=8,cells=new Array(64).fill(null),undoP=[],ptool='pencil',painting=false,selfie=null;
 function guideAt(i){
-  if(guideP<0||!showGuide)return null;
+  if(!showGuide)return null;
+  if(selfie&&N===16)return selfie[i];
+  if(guideP<0)return null;
   const c=PT[guideP][1][Math.floor(Math.floor(i/N)*8/N)][Math.floor((i%N)*8/N)];
   return c==='.'?null:(c==='W'?'#9aa6b2':PAL[c]);
 }
@@ -614,7 +656,7 @@ function drawPixels(){
   const S=cv.width/N;ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
   for(let i=0;i<N*N;i++){
     const g=cells[i]?null:guideAt(i);
-    if(cells[i]||g){ctx.globalAlpha=cells[i]?1:.26;ctx.fillStyle=cells[i]||g;ctx.fillRect((i%N)*S,Math.floor(i/N)*S,S+1,S+1);ctx.globalAlpha=1;}
+    if(cells[i]||g){ctx.globalAlpha=cells[i]?1:(selfie&&N===16?.5:.26);ctx.fillStyle=cells[i]||g;ctx.fillRect((i%N)*S,Math.floor(i/N)*S,S+1,S+1);ctx.globalAlpha=1;}
   }
   ctx.strokeStyle='#cfd8e0';ctx.lineWidth=3;ctx.beginPath();
   for(let k=0;k<=N;k++){ctx.moveTo(k*S,0);ctx.lineTo(k*S,cv.height);ctx.moveTo(0,k*S);ctx.lineTo(cv.width,k*S);}
@@ -866,21 +908,32 @@ COLOURS.forEach(([name,hex],i)=>{
     if(mode==='paint'&&ctool==='rubber')setC('brush');};
   $('swatches').appendChild(b);
 });
+SKIN.forEach(([name,hex])=>{
+  const b=document.createElement('button');b.className='sw skinsw';b.hidden=true;b.style.background=hex;b.setAttribute('aria-label',name);b.setAttribute('aria-pressed','false');
+  b.onclick=()=>{colour=hex;document.querySelectorAll('.sw').forEach(s=>s.setAttribute('aria-pressed',s===b));if(mode==='pixels'&&ptool==='rubber')setTool('pencil');};
+  $('swatches').appendChild(b);
+});
+function swatchSets(){
+  document.querySelectorAll('.mixsw').forEach(b=>{b.hidden=!(mode==='paint'&&mixed);});
+  document.querySelectorAll('.skinsw').forEach(b=>{b.hidden=!(mode==='pixels'&&selfie);});
+  $('swatches').classList.toggle('many',mode==='paint'&&mixed);
+  $('swatches').classList.toggle('skin',mode==='pixels'&&!!selfie);
+}
 function setMode(m){
   mode=m;
   ['pixels','shapes','pen','paint','patterns'].forEach(k=>{$('left-'+k).hidden=k!==m;});
   svg.toggleAttribute('hidden',m!=='shapes');cv.hidden=m!=='pixels';pen.hidden=m!=='pen';pc.hidden=m!=='paint';pat.toggleAttribute('hidden',m!=='patterns');$('shape-actions').hidden=m!=='shapes';
   $('tool-name').textContent=INFO[m][0];
-  document.querySelectorAll('.mixsw').forEach(b=>{b.hidden=!(m==='paint'&&mixed);});$('swatches').classList.toggle('many',m==='paint'&&mixed);
   resetClear();applyLock();refresh();
 }
 function refresh(){
   const g=mode==='shapes'?guideS:mode==='pixels'?guideP:mode==='pen'?guideD:mode==='paint'?guideC:-1;
   $('paint-lines').toggleAttribute('hidden',mode!=='paint');$('paint-lines').innerHTML=(AS.on&&AS.tool==='paint')?(AS.lines||''):((guideC>=0&&showGuide)?PAINTL[guideC][1]:'');
   $('pen-guide').toggleAttribute('hidden',mode!=='pen');$('pen-guide').innerHTML=(AS.on&&AS.tool==='pen')?(AS.pguide||''):((guideD>=0&&showGuide)?PENL[guideD][1]:'');
-  $('guide').hidden=g<0;$('guide-label').textContent=showGuide?'Hide guide':'Show guide';
+  $('guide').hidden=g<0&&!(mode==='pixels'&&selfie);$('guide-label').textContent=showGuide?'Hide guide':'Show guide';
   $('tag').textContent=pname;$('tag').hidden=mode==='shapes'||!pname;
   if(mode==='shapes')renderShapes();else if(mode==='pixels')drawPixels();else if(mode==='pen')drawPen();else if(mode==='patterns')renderPat();
+  swatchSets();
 }
 /* name / text entry */
 const editingText=()=>mode==='shapes'&&sel>=0&&shapes[sel].t==='text';
@@ -924,7 +977,7 @@ $('picker').onclick=e=>{
   if(mode==='patterns'){patK=k;}
   else if(mode==='paint'){if(phist.length&&!phist[phist.length-1].clear)phist.push({clear:true});guideC=k;drawPaint();}
   else if(mode==='pen'){if(hist.length&&!hist[hist.length-1].clear)hist.push({clear:true});guideD=k;}
-  else if(mode==='shapes'){saveS();shapes=[];sel=-1;guideS=k;}else{saveP();cells=new Array(N*N).fill(null);guideP=k;}
+  else if(mode==='shapes'){saveS();shapes=[];sel=-1;guideS=k;}else{saveP();cells=new Array(N*N).fill(null);guideP=k;selfie=null;}
   showGuide=true;$('picker').hidden=true;refresh();
 };
 
@@ -970,7 +1023,7 @@ const ART={
 })();
 function view(work){document.body.classList.toggle('at-home',!work);$('home').hidden=work;$('bar').hidden=!work;$('work').hidden=!work;}
 function closeChallenge(){stopSpeech();$('challenge').hidden=true;$('challenge-btn').setAttribute('aria-pressed','false');}
-function goHome(){endAssess();$('asresult').hidden=true;$('asmenu').hidden=true;closeChallenge();$('intro').hidden=true;$('mixer').hidden=true;stopSpeech();view(false);}
+function goHome(){camClose();selfie=null;endAssess();$('asresult').hidden=true;$('asmenu').hidden=true;closeChallenge();$('intro').hidden=true;$('mixer').hidden=true;stopSpeech();view(false);}
 function openTool(k){
   closeChallenge();view(true);setMode(k);
   $('intro-art').innerHTML=ART[k];$('intro-name').textContent=INFO[k][0];$('intro-text').textContent=INFO[k][1];
@@ -1142,7 +1195,7 @@ const SYM={circle:0,square:90,rectangle:180,oval:180,triangle:360,semicircle:360
 
 function asMenu(){endAssess();$('intro').hidden=true;$('mixer').hidden=true;view(false);$('asresult').hidden=true;$('asmenu').hidden=false;}
 function asStart(tool){
-  endAssess();
+  endAssess();selfie=null;
   AS={on:true,tool,round:0,res:[],name:($('as-name').value||'').trim().slice(0,20),saved:[guideS,guideP,guideC,showGuide]};
   const pool=tool==='shapes'?AS_SHAPES.map(n=>ST.findIndex(s=>s[0]===n)):
     tool==='pixels'?PT.map((p,i)=>[p,i]).filter(([p,i])=>i<24&&!p[1].join('').includes('W')).map(x=>x[1]):
@@ -1308,6 +1361,65 @@ $('asm-close').onclick=()=>{$('asmenu').hidden=true;};
   ['shapes','pixels','pen','paint'].forEach(k=>$('ast-'+k).onclick=()=>asStart(k));
   $('as-say').hidden=!canSpeak;
 })();
+/* ---------- PORTRAIT: a selfie becomes a faint 16 x 16 colour guide. The photo is never saved or sent anywhere. ---------- */
+const PAL_ALL=COLOURS.map(c=>c[1]).concat(SKIN.map(c=>c[1])),SKIN_HEX=SKIN.map(c=>c[1]);
+function nearestHex(r,g,b){
+  let best=null,bd=1e9;
+  PAL_ALL.forEach(hex=>{
+    const R=parseInt(hex.slice(1,3),16),G=parseInt(hex.slice(3,5),16),B=parseInt(hex.slice(5,7),16),rm=(r+R)/2,dr=r-R,dg=g-G,db=b-B,d=(2+rm/256)*dr*dr+4*dg*dg+(2+(255-rm)/256)*db*db;
+    const w=SKIN_HEX.includes(hex)?d*.7:d;/* lean towards skin tones so faces stay calm */
+    if(w<bd){bd=w;best=hex;}
+  });
+  return best;
+}
+/* 64 x 64 photo in, 256 palette colours out. The brightness is stretched first so a dim classroom still works. */
+function quantise(d){
+  const px=[];
+  for(let by=0;by<16;by++)for(let bx=0;bx<16;bx++){let r=0,g=0,b=0;for(let y=0;y<4;y++)for(let x=0;x<4;x++){const o=((by*4+y)*64+bx*4+x)*4;r+=d[o];g+=d[o+1];b+=d[o+2];}px.push([r/16,g/16,b/16]);}
+  const L=px.map(p=>.3*p[0]+.59*p[1]+.11*p[2]).sort((a,b)=>a-b),st=L[242]-L[13]>40,lo=st?L[13]:0,k=st?255/(L[242]-L[13]):1;
+  return px.map(p=>nearestHex(...p.map(v=>Math.max(0,Math.min(255,(v-lo)*k)))));
+}
+let camStream=null,camCells=null,camHold=null;
+function camStop(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}$('cam-video').srcObject=null;}
+function camState(s){
+  $('cam-msg').textContent={ask:'Ask your teacher first. The iPad turns your photo into coloured squares to help you draw yourself.',live:'Look at the camera. Fit your face in the oval. Then press Take photo.',review:'This is your guide. Do you like it?',err:'The camera did not open. Ask your teacher for help.'}[s];
+  $('cam-hold').hidden=s!=='ask';$('cam-hold').textContent='Teacher: hold to allow the camera';$('cam-open').hidden=true;
+  $('cam-view').hidden=s!=='live';$('cam-snap').hidden=s!=='live';
+  $('cam-prev').hidden=s!=='review';$('cam-use').hidden=s!=='review';$('cam-retry').hidden=!(s==='review'||s==='err');
+}
+async function camOpen(){
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:640}},audio:false});
+    const v=$('cam-video');v.srcObject=camStream;try{await v.play();}catch(_){}
+    camState('live');
+  }catch(e){
+    camStop();camState('err');
+    if(e&&e.name==='NotAllowedError')$('cam-msg').textContent='The camera is blocked. Ask your teacher to allow the camera for this website.';
+  }
+}
+function camSnap(){
+  const v=$('cam-video'),vw=v.videoWidth,vh=v.videoHeight;if(!vw)return;
+  const s=Math.min(vw,vh),c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');
+  x.translate(64,0);x.scale(-1,1);x.drawImage(v,(vw-s)/2,(vh-s)/2,s,s,0,0,64,64);
+  camCells=quantise(x.getImageData(0,0,64,64).data);camStop();
+  const p=$('cam-prev').getContext('2d');
+  camCells.forEach((h,i)=>{p.fillStyle=h;p.fillRect((i%16)*16,Math.floor(i/16)*16,17,17);});
+  p.strokeStyle='rgba(0,0,0,.18)';p.lineWidth=1;p.beginPath();for(let k=0;k<=16;k++){p.moveTo(k*16,0);p.lineTo(k*16,256);p.moveTo(0,k*16);p.lineTo(256,k*16);}p.stroke();
+  camState('review');
+}
+function camClose(){camStop();camCells=null;$('cam').hidden=true;}
+$('selfie-btn').onclick=()=>{if(mode!=='pixels')return;$('cam').hidden=false;camState('ask');};
+$('cam-hold').addEventListener('pointerdown',()=>{
+  camHold=setTimeout(()=>{camHold=null;$('cam-hold').hidden=true;$('cam-open').hidden=false;},1200);
+});
+['pointerup','pointercancel'].forEach(ev=>$('cam-hold').addEventListener(ev,()=>{
+  if(camHold){clearTimeout(camHold);camHold=null;}
+}));
+$('cam-open').onclick=camOpen;$('cam-retry').onclick=camOpen;$('cam-snap').onclick=camSnap;$('cam-cancel').onclick=camClose;
+$('cam-use').onclick=()=>{
+  saveP();selfie=camCells;camCells=null;N=16;cells=new Array(256).fill(null);gridButtons();guideP=-1;showGuide=true;
+  camStop();$('cam').hidden=true;refresh();
+};
 /* a link ending in #pixels, #shapes, #pen, #paint or #patterns opens on that tool, already locked */
 const startMode=(location.hash||'').slice(1).toLowerCase();
 const asHash=/^assess-(shapes|pixels|pen|paint)$/.exec(startMode);
