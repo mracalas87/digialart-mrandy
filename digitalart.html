@@ -657,7 +657,7 @@ function drawPixels(){
   const S=cv.width/N;ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
   for(let i=0;i<N*N;i++){
     const g=cells[i]?null:guideAt(i);
-    if(cells[i]||g){ctx.globalAlpha=cells[i]?1:(selfie&&N===SN?.5:.26);ctx.fillStyle=cells[i]||g;ctx.fillRect((i%N)*S,Math.floor(i/N)*S,S+1,S+1);ctx.globalAlpha=1;}
+    if(cells[i]||g){ctx.globalAlpha=cells[i]?1:(selfie&&N===SN?.6:.26);ctx.fillStyle=cells[i]||g;ctx.fillRect((i%N)*S,Math.floor(i/N)*S,S+1,S+1);ctx.globalAlpha=1;}
   }
   ctx.strokeStyle='#cfd8e0';ctx.lineWidth=3;ctx.beginPath();
   for(let k=0;k<=N;k++){ctx.moveTo(k*S,0);ctx.lineTo(k*S,cv.height);ctx.moveTo(0,k*S);ctx.lineTo(cv.width,k*S);}
@@ -1373,12 +1373,14 @@ function nearestHex(r,g,b){
   });
   return best;
 }
-/* 96 x 96 photo in, SN x SN palette colours out. The brightness is stretched first so a dim classroom still works. */
+/* 96 x 96 photo in, SN x SN true colours out. The brightness is stretched first so a dim classroom still works. */
 function quantise(d){
   const B=96/SN,px=[];
   for(let by=0;by<SN;by++)for(let bx=0;bx<SN;bx++){let r=0,g=0,b=0;for(let y=0;y<B;y++)for(let x=0;x<B;x++){const o=((by*B+y)*96+bx*B+x)*4;r+=d[o];g+=d[o+1];b+=d[o+2];}px.push([r/(B*B),g/(B*B),b/(B*B)]);}
   const L=px.map(p=>.3*p[0]+.59*p[1]+.11*p[2]).sort((a,b)=>a-b),n=L.length,a=L[Math.floor(n*.05)],z=L[Math.floor(n*.95)],st=z-a>40,lo=st?a:0,k=st?255/(z-a):1;
-  return px.map(p=>nearestHex(...p.map(v=>Math.max(0,Math.min(255,(v-lo)*k)))));
+  /* true colours (not snapped to swatches) with a little extra contrast and colour so a face reads as a face */
+  return px.map(p=>{const m=p.map(v=>Math.max(0,Math.min(255,(v-lo)*k))),l=.3*m[0]+.59*m[1]+.11*m[2];
+    return '#'+m.map(v=>{const w=Math.max(0,Math.min(255,l+(v-l)*1.1));return Math.round(w).toString(16).padStart(2,'0');}).join('');});
 }
 let camStream=null,camCells=null,camHold=null;
 function camStop(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}$('cam-video').srcObject=null;}
