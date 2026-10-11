@@ -1373,14 +1373,20 @@ function nearestHex(r,g,b){
   });
   return best;
 }
-/* 96 x 96 photo in, SN x SN true colours out. The brightness is stretched first so a dim classroom still works. */
+/* 96 x 96 photo in, SN x SN true colours out. Brightness is stretched using the middle of the picture (where the face is), then local contrast is added so eyes, brows, mouth and hair edges stand out. */
 function quantise(d){
   const B=96/SN,px=[];
   for(let by=0;by<SN;by++)for(let bx=0;bx<SN;bx++){let r=0,g=0,b=0;for(let y=0;y<B;y++)for(let x=0;x<B;x++){const o=((by*B+y)*96+bx*B+x)*4;r+=d[o];g+=d[o+1];b+=d[o+2];}px.push([r/(B*B),g/(B*B),b/(B*B)]);}
-  const L=px.map(p=>.3*p[0]+.59*p[1]+.11*p[2]).sort((a,b)=>a-b),n=L.length,a=L[Math.floor(n*.05)],z=L[Math.floor(n*.95)],st=z-a>40,lo=st?a:0,k=st?255/(z-a):1;
-  /* true colours (not snapped to swatches) with a little extra contrast and colour so a face reads as a face */
-  return px.map(p=>{const m=p.map(v=>Math.max(0,Math.min(255,(v-lo)*k))),l=.3*m[0]+.59*m[1]+.11*m[2];
-    return '#'+m.map(v=>{const w=Math.max(0,Math.min(255,l+(v-l)*1.1));return Math.round(w).toString(16).padStart(2,'0');}).join('');});
+  const lum=p=>.3*p[0]+.59*p[1]+.11*p[2],c0=Math.floor(SN*.2),c1=Math.ceil(SN*.8),mid=[];
+  for(let y=c0;y<c1;y++)for(let x=c0;x<c1;x++)mid.push(lum(px[y*SN+x]));
+  mid.sort((a,b)=>a-b);const a=mid[Math.floor(mid.length*.03)],z=mid[Math.floor(mid.length*.97)],st=z-a>30,lo=st?a:0,k=st?255/(z-a):1;
+  const m=px.map(p=>p.map(v=>Math.max(0,Math.min(255,(v-lo)*k)))),L=m.map(lum),out=[];
+  for(let y=0;y<SN;y++)for(let x=0;x<SN;x++){
+    let t=0,n=0;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const xx=x+dx,yy=y+dy;if(xx>=0&&yy>=0&&xx<SN&&yy<SN){t+=L[yy*SN+xx];n++;}}
+    const i=y*SN+x,boost=1.2*(L[i]-t/n),l=L[i];
+    out.push('#'+m[i].map(v=>{let w=l+(v-l)*1.15+boost;w=Math.max(0,Math.min(255,w));return Math.round(w).toString(16).padStart(2,'0');}).join(''));
+  }
+  return out;
 }
 let camStream=null,camCells=null,camHold=null;
 function camStop(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}$('cam-video').srcObject=null;}
