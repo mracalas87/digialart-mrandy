@@ -277,7 +277,10 @@ body.assessing #left-pixels h2:nth-of-type(3),body.assessing #left-pixels .grid:
 #code-cols{display:flex;gap:6px;flex-wrap:wrap}
 #code-cols button{width:44px;height:44px;border-radius:50%;border:3px solid var(--line)}
 #code-cols button[aria-pressed="true"]{outline:4px solid var(--fg);outline-offset:1px}
-#code-msg{margin:0;min-height:2.6em;font-size:1.2rem;text-align:center}
+#code-msg{margin:6px 0 0;min-height:2.6em;font-size:1.15rem;text-align:center;line-height:1.25}
+#code-ctl{justify-content:center;margin-bottom:6px}
+#code-pick{position:fixed;inset:0;z-index:12;background:rgba(15,25,40,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+#code-pick[hidden]{display:none}
 #code-msg.ok{color:#2e7d32}
 @media (max-width:600px){.cl{font-size:1.05rem;gap:3px}.cl .st{width:36px;height:36px}.cl .chip{width:28px;height:28px}#code-mission svg{width:110px;height:110px}}
 @media (prefers-reduced-motion:reduce){#turn .turn-arrow{animation:none}}
@@ -470,7 +473,7 @@ body.assessing #left-pixels h2:nth-of-type(3),body.assessing #left-pixels .grid:
       <button class="pill" id="code-home">Home</button>
     </div>
   </div>
-  <div class="row chips" id="code-chips" role="group" aria-label="Choose a mission"></div>
+  <div class="row" id="code-picrow"><button class="pill go" id="code-pics">Picture guides</button><span class="code-hint" style="margin:0">Pick a faint picture. Then colour its squares with code.</span></div>
   <div class="row chips" id="code-temps" role="group" aria-label="Start from a template"></div>
   <div id="code-mission" hidden>
     <svg id="code-target" viewBox="-1.1 -0.2 11.6 11.6" aria-label="The picture to make"></svg>
@@ -478,20 +481,27 @@ body.assessing #left-pixels h2:nth-of-type(3),body.assessing #left-pixels .grid:
   </div>
   <div class="code-body">
     <div class="code-left">
+      <div class="row" id="code-ctl">
+        <button class="pill go" id="code-run">Run</button>
+        <button class="pill" id="code-step">Step</button>
+        <button class="pill" id="code-wipe">Wipe picture</button>
+      </div>
       <svg id="code-grid" viewBox="-1.1 -0.2 11.6 11.6" aria-label="Pixel grid with numbers"></svg>
+      <p id="code-msg" aria-live="polite"></p>
       <p class="code-hint">x goes across. y goes up. Say across first, then up.</p>
     </div>
     <div class="code-right">
       <div id="code-list"></div>
       <div class="row"><button class="pill" id="code-add">Add a line</button><button class="pill" id="code-clear">Start again</button></div>
       <div id="code-cols" aria-label="Colours"></div>
-      <div class="row">
-        <button class="pill go" id="code-run">Run</button>
-        <button class="pill" id="code-step">Step</button>
-        <button class="pill" id="code-wipe">Wipe picture</button>
-      </div>
-      <p id="code-msg" aria-live="polite"></p>
     </div>
+  </div>
+</div>
+
+<div id="code-pick" hidden>
+  <div class="sheet" role="dialog" aria-label="Picture guides for coding">
+    <div class="sheet-top"><h2>Pick a picture to code</h2><button class="pill" id="code-pick-close">Close</button></div>
+    <div class="tiles" id="code-tiles"></div>
   </div>
 </div>
 
@@ -1507,24 +1517,19 @@ $('cam-use').onclick=()=>{
 };
 /* ---------- CODE A PICTURE: each line of code paints one square, found with two numbers. Nothing is saved or sent. ---------- */
 const GN=10;/* the coding grid is 10 x 10 */
-const CM=[
- ['Red dot','Paint the red square. Read along to find x, then up to find y.',[[3,5,'R']]],
- ['Blue line','Make the blue line. What stays the same? What changes?',[[1,1,'B'],[2,1,'B'],[3,1,'B'],[4,1,'B'],[5,1,'B']]],
- ['Stairs','Make the green stairs. Look at both numbers each time.',[[1,1,'G'],[2,2,'G'],[3,3,'G'],[4,4,'G'],[5,5,'G']]],
- ['Traffic light','Make the traffic light. Which colour is on top?',[[5,8,'R'],[5,7,'Y'],[5,6,'G']]],
- ['Smile','Make the smiling face. Two eyes and a mouth. It takes 8 lines.',[[4,7,'X'],[7,7,'X'],[3,5,'X'],[8,5,'X'],[4,4,'X'],[7,4,'X'],[5,3,'X'],[6,3,'X']]]
-];
+const CM=[];/* missions removed: the coding area uses templates and picture guides */
 const CT=[
  ['Four corners','Four squares, one in each corner. Run it. Then change the colours.',(()=>[[1,1,0],[10,1,6],[1,10,2],[10,10,3]])()],
  ['Diagonal','A line of squares going up. Look at the x and y numbers. What do you notice?',(()=>{const a=[];for(let i=1;i<=10;i++)a.push([i,i,7]);return a;})()],
  ['Smile','A face with eyes and a smile. Can you add a nose? Can you change the colour?',[[4,7,10],[7,7,10],[3,5,10],[8,5,10],[4,4,10],[7,4,10],[5,3,10],[6,3,10]]],
  ['Tree','A tree. The green is made of lots of squares. Can you make it taller?',(()=>{const a=[];[[9,5,6],[8,4,7],[7,3,8],[6,2,9]].forEach(([y,x0,x1])=>{for(let x=x0;x<=x1;x++)a.push([x,y,4]);});[[5,5],[5,6],[4,5],[4,6],[3,5],[3,6]].forEach(([y,x])=>a.push([x,y,9]));return a;})()]
 ];
+let cguide=null,cguideName='';
 let cprog=[{x:3,y:5,c:0}],csel=0,cpic=new Array(GN*GN).fill(null),cmis=-1,crun=-1,ctimer=null,cdiff=[],cclear=null;
 const WHITE='#ffffff',cidx=(x,y)=>(GN-y)*GN+(x-1);
 function cgridSvg(pic,opts){
-  opts=opts||{};let h='';
-  for(let y=GN;y>=1;y--)for(let x=1;x<=GN;x++){const col=pic[cidx(x,y)];h+='<rect x="'+(x-1)+'" y="'+(GN-y)+'" width="1" height="1" fill="'+(col||'#ffffff')+'" stroke="#cfd8e0" stroke-width=".05"/>';}
+  opts=opts||{};let h='';const gd=opts.guide;
+  for(let y=GN;y>=1;y--)for(let x=1;x<=GN;x++){const col=pic[cidx(x,y)];h+='<rect x="'+(x-1)+'" y="'+(GN-y)+'" width="1" height="1" fill="'+(col||'#ffffff')+'" stroke="#cfd8e0" stroke-width=".05"/>';if(!col&&gd&&gd[cidx(x,y)])h+='<rect x="'+(x-1)+'" y="'+(GN-y)+'" width="1" height="1" fill="'+(gd[cidx(x,y)]===WHITE?'#9aa6b2':gd[cidx(x,y)])+'" opacity=".3"/>';}
   for(let i=1;i<=GN;i++){
     h+='<text x="'+(i-.5)+'" y="'+(GN+.62)+'" text-anchor="middle" font-size=".55" fill="#586a86" font-family="Baloo 2,Nunito,sans-serif" font-weight="700">'+i+'</text>';
     h+='<text x="-.5" y="'+(GN-i+.7)+'" text-anchor="middle" font-size=".55" fill="#586a86" font-family="Baloo 2,Nunito,sans-serif" font-weight="700">'+i+'</text>';
@@ -1538,7 +1543,7 @@ function cdraw(){
   cdiff.forEach(i=>{ex+='<rect x="'+(i%GN+.07)+'" y="'+(Math.floor(i/GN)+.07)+'" width=".86" height=".86" fill="none" stroke="#d8433b" stroke-width=".1" stroke-dasharray=".2 .15"/>';});
   const L=cprog[crun>=0?crun:csel];
   if(L)ex+='<rect x="'+(L.x-1+.05)+'" y="'+(GN-L.y+.05)+'" width=".9" height=".9" fill="none" stroke="#1c2a44" stroke-width=".1" rx=".12"/><rect x="'+(L.x-1+.05)+'" y="'+(GN-L.y+.05)+'" width=".9" height=".9" fill="none" stroke="#ffc83d" stroke-width=".05" rx=".12"/>';
-  $('code-grid').innerHTML=cgridSvg(cpic,{extra:ex});
+  $('code-grid').innerHTML=cgridSvg(cpic,{extra:ex,guide:cguide});
 }
 function clist(){
   let h='';
@@ -1554,9 +1559,9 @@ function clist(){
 function cmsg(t,ok){$('code-msg').textContent=t;$('code-msg').className=ok?'ok':'';}
 function cstop(){if(ctimer){clearTimeout(ctimer);ctimer=null;}crun=-1;$('code-run').textContent='Run';$('code-run').classList.remove('run');}
 function cwipe(){cstop();cpic=new Array(GN*GN).fill(null);cdiff=[];}
-function ctarget(){const t=new Array(GN*GN).fill(null);CM[cmis][2].forEach(([x,y,c])=>{t[cidx(x,y)]=PAL[c];});return t;}
+function ctarget(){if(cguide)return cguide;const t=new Array(GN*GN).fill(null);CM[cmis][2].forEach(([x,y,c])=>{t[cidx(x,y)]=PAL[c];});return t;}
 function ccheck(){
-  if(cmis<0){cmsg('Your code made a picture. The computer followed every line, in order.',true);return;}
+  if(cmis<0&&!cguide){cmsg('Your code made a picture. The computer followed every line, in order.',true);return;}
   const t=ctarget();cdiff=[];
   for(let i=0;i<GN*GN;i++)if((t[i]||WHITE)!==(cpic[i]||WHITE))cdiff.push(i);
   if(!cdiff.length)cmsg('Well done! Your code made the picture.',true);
@@ -1583,8 +1588,7 @@ function cstepGo(){
   if(cstepI>=cprog.length){ccheck();cstepI=0;}else cmsg('Line '+cstepI+' done. Press Step for the next line.');
 }
 function cmission(k){
-  cstop();cwipe();cstepI=0;cmis=k;cprog=[{x:1,y:1,c:0}];csel=0;
-  document.querySelectorAll('#code-chips button').forEach((b,i)=>b.setAttribute('aria-pressed',i===k+1));
+  cstop();cwipe();cstepI=0;cmis=k;cguide=null;cprog=[{x:1,y:1,c:0}];csel=0;
   document.querySelectorAll('#code-temps button').forEach(b=>b.setAttribute('aria-pressed','false'));
   $('code-mission').hidden=k<0;
   if(k>=0){const t=ctarget();$('code-target').innerHTML=cgridSvg(t);$('code-mtitle').textContent=CM[k][0];$('code-mtext').textContent=CM[k][1];}
@@ -1596,13 +1600,35 @@ function ctemplate(k){
   document.querySelectorAll('#code-temps button').forEach((b,i)=>b.setAttribute('aria-pressed',i===k));
   cmsg(CT[k][0]+'. '+CT[k][1]+' Press Run to watch it.');clist();cdraw();
 }
+/* guides for the coding grid: easy ones are drawn on the 10 x 10 grid (top row is y = 10), bigger ones reuse the 8 x 8 pixel pictures */
+const CE=[
+ ['Traffic light',['..........','..........','....R.....','....Y.....','....G.....','....X.....','....X.....','....X.....','..........','..........']],
+ ['Flower',['..........','..........','....K.....','...KYK....','....K.....','....D.....','....DD....','....D.....','..........','..........']],
+ ['House',['..........','..........','..........','....R.....','...RRR....','...OOO....','...OBO....','..........','..........','..........']],
+ ['Mushroom',['..........','..........','..........','...RRR....','..RRRRR...','....N.....','....N.....','..........','..........','..........']],
+ ['Tree',['..........','..........','....D.....','...DDD....','..DDDDD...','....N.....','....N.....','..........','..........','..........']],
+ ['Ice cream',['..........','..........','..........','...KKK....','...KKK....','...OOO....','....O.....','....O.....','..........','..........']],
+ ['Sun',['..........','..........','....O.....','...YYY....','..OYYYO...','...YYY....','....O.....','..........','..........','..........']],
+ ['Heart',['..........','..........','...R.R....','..RRRRR...','..RRRRR...','...RRR....','....R.....','..........','..........','..........']]
+];
+const CG=[];
+CE.forEach(([name,rows])=>{const g=new Array(GN*GN).fill(null);rows.forEach((row,r)=>row.split('').forEach((ch,c)=>{if(ch!=='.')g[cidx(c+1,GN-r)]=PAL[ch];}));CG.push({name,g,easy:true});});
+PT.slice(0,24).forEach(p=>{const g=new Array(GN*GN).fill(null);p[1].forEach((row,r)=>row.split('').forEach((ch,c)=>{if(ch!=='.')g[cidx(c+2,GN-1-r)]=PAL[ch];}));CG.push({name:p[0],g,easy:false});});
+CG.forEach(o=>{o.n=o.g.filter(c=>c&&c!==WHITE).length;});
+function cpicThumb(o){let r='';o.g.forEach((c,i)=>{if(c)r+='<rect x="'+(i%GN)+'" y="'+Math.floor(i/GN)+'" width="1.02" height="1.02" fill="'+(c===WHITE?'#e6ebf0':c)+'"/>';});return '<svg viewBox="-.2 -.2 10.4 10.4">'+r+'</svg>';}
+function cpicture(k){
+  cmission(-1);const o=CG[k];
+  cguide=o.g;cguideName=o.name;cdraw();
+  cmsg(o.name+': '+o.n+' square'+(o.n>1?'s':'')+' to colour. Tap a square on the grid, pick its colour, then press Add a line.');
+}
 function cedit(fn){if(ctimer){cstop();}cdiff=[];fn();clist();cdraw();}
 (function codeInit(){
-  let c='<button data-k="-1" aria-pressed="true">Free play</button>';CM.forEach((m,i)=>{c+='<button data-k="'+i+'" aria-pressed="false">'+(i+1)+'. '+m[0]+'</button>';});
-  $('code-chips').innerHTML=c;
   $('code-temps').innerHTML='<span class="code-hint" style="margin:0 4px 0 0">Templates:</span>'+CT.map((t,i)=>'<button data-k="'+i+'" aria-pressed="false">'+t[0]+'</button>').join('');
+  $('code-tiles').innerHTML='<h3>Easy: only a few squares</h3>'+CG.map((o,k)=>(o.easy?'<button class="tile" data-k="'+k+'">'+cpicThumb(o)+o.name+' <small>'+o.n+' squares</small></button>':'')).join('')+'<h3>Bigger pictures: lots of lines</h3>'+CG.map((o,k)=>(o.easy?'':'<button class="tile" data-k="'+k+'">'+cpicThumb(o)+o.name+' <small>'+o.n+' squares</small></button>')).join('');
+  $('code-pics').onclick=()=>{$('code-pick').hidden=false;};
+  $('code-pick-close').onclick=()=>{$('code-pick').hidden=true;};
+  $('code-pick').onclick=e=>{if(e.target===$('code-pick')){$('code-pick').hidden=true;return;}const b=e.target.closest('.tile');if(!b)return;$('code-pick').hidden=true;cpicture(+b.dataset.k);};
   $('code-temps').onclick=e=>{const b=e.target.closest('button');if(!b)return;ctemplate(+b.dataset.k);};
-  $('code-chips').onclick=e=>{const b=e.target.closest('button');if(b)cmission(+b.dataset.k);};
   $('code-cols').innerHTML=COLOURS.map((c,k)=>'<button data-k="'+k+'" style="background:'+c[1]+'" aria-label="'+c[0]+'" aria-pressed="false"></button>').join('');
   $('code-cols').onclick=e=>{const b=e.target.closest('button');if(!b)return;cedit(()=>{if(!cprog[csel])cprog.push({x:1,y:1,c:0}),csel=cprog.length-1;cprog[csel].c=+b.dataset.k;});};
   $('code-list').onclick=e=>{
@@ -1634,7 +1660,7 @@ function cedit(fn){if(ctimer){cstop();}cdiff=[];fn();clist();cdraw();}
   };
 })();
 function codeOpen(){closeChallenge();$('intro').hidden=true;$('code').hidden=false;$('code-home').hidden=locked;cmission(-1);}
-function codeClose(){cstop();$('code').hidden=true;}
+function codeClose(){cstop();$('code-pick').hidden=true;$('code').hidden=true;}
 $('home-code').onclick=codeOpen;
 /* a link ending in #pixels, #shapes, #pen, #paint or #patterns opens on that tool, already locked */
 const startMode=(location.hash||'').slice(1).toLowerCase();
