@@ -179,10 +179,11 @@ input{-webkit-user-select:text;user-select:text}
   body.at-home footer img{width:70px;height:70px}
 }
 /* assessment mode */
-.cards{grid-template-rows:repeat(2,1fr) auto}
-@media (orientation:portrait),(max-width:820px){.cards{grid-template-rows:repeat(3,1fr) auto}}
-#home-assess{grid-column:1/-1;flex-direction:row;justify-content:center;gap:16px;min-height:84px;background:#1c2a44;color:#ffc83d;padding:10px 20px}
-#home-assess svg{flex:none;width:52px;height:52px;background:transparent}
+.cards{grid-template-rows:repeat(2,1fr) auto auto}
+@media (orientation:portrait),(max-width:820px){.cards{grid-template-rows:repeat(3,1fr) auto auto}}
+#home-challenge,#home-assess{grid-column:1/-1;flex-direction:row;justify-content:center;gap:16px;min-height:84px;background:#1c2a44;color:#ffc83d;padding:10px 20px}
+#home-challenge svg,#home-assess svg{flex:none;width:52px;height:52px;background:transparent}
+#home-challenge{background:var(--accent);color:var(--accent-ink)}
 body.assessing #pictures,body.assessing #name-btn,body.assessing #guide,body.assessing #challenge-btn,body.assessing #lock{display:none}
 body.assessing #left-pixels h2:nth-of-type(2),body.assessing #left-pixels .grid:nth-of-type(2){display:none}
 #asbar{display:flex;align-items:center;gap:10px;background:var(--accent);color:var(--accent-ink);border-radius:16px;padding:8px 10px 8px 14px;flex-wrap:wrap}
@@ -242,6 +243,43 @@ body.assessing #left-pixels h2:nth-of-type(3),body.assessing #left-pixels .grid:
   #turn .turn-arrow{animation:nudge 2.4s ease-in-out infinite;transform-origin:50% 50%}
 }
 @keyframes nudge{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
+/* code a picture: a coding area where numbers and axes place the pixels */
+#code{position:fixed;inset:0;z-index:10;background:var(--bg);overflow:auto;padding:12px 16px 20px;display:flex;flex-direction:column;gap:10px}
+#code[hidden]{display:none}
+#code .code-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#code h2{font-family:var(--display);font-size:1.9rem;line-height:1;margin:0}
+#code .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#code .pill.go{background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-size:1.3rem}
+#code .pill.run{background:var(--danger);color:#fff}
+#code .chips button{min-height:44px;padding:0 16px;border-radius:999px;background:var(--panel);font-family:var(--display);font-size:1.15rem}
+#code .chips button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+#code-mission{display:flex;gap:14px;align-items:center;background:var(--panel);border-radius:18px;padding:10px 14px}
+#code-mission svg{width:150px;height:150px;flex:none}
+#code-mission b{font-family:var(--display);font-size:1.5rem}
+#code-mission p{margin:4px 0 0;font-size:1.15rem}
+.code-body{display:flex;flex-direction:column;gap:12px;align-items:center}
+.code-left{width:min(100%,460px);position:sticky;top:0;z-index:2;background:var(--bg);padding:4px 0}
+#code-grid{width:100%;aspect-ratio:1;background:var(--panel);border-radius:16px;display:block;touch-action:manipulation}
+.code-hint{margin:6px 0 0;text-align:center;font-size:1.05rem;color:var(--muted)}
+.code-right{width:min(100%,640px);display:flex;flex-direction:column;gap:10px}
+@media (orientation:landscape) and (min-width:900px){.code-body{flex-direction:row;align-items:flex-start;justify-content:center}.code-left{width:min(52vh,44vw)}}
+#code-list{display:flex;flex-direction:column;gap:6px}
+.cl{display:flex;align-items:center;gap:6px;background:var(--panel);border-radius:14px;padding:5px 8px;border:3px solid transparent;font-family:var(--display);font-size:1.25rem}
+.cl[aria-current="true"]{border-color:var(--accent)}
+.cl.now{background:#fff1b8;color:#1c2a44}
+.cl .n{width:26px;text-align:center;color:var(--muted)}
+.cl .w{margin-right:2px}
+.cl .ax{font-size:1.1rem;color:var(--muted);margin-left:4px}
+.cl .st{width:42px;height:42px;border-radius:12px;background:var(--btn);font-family:var(--display);font-size:1.6rem;line-height:1}
+.cl .val{min-width:26px;text-align:center;font-size:1.6rem}
+.cl .chip{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);margin-left:auto;flex:none}
+.cl .del{width:38px;height:38px;border-radius:12px;background:transparent;color:var(--muted);font-size:1.3rem}
+#code-cols{display:flex;gap:6px;flex-wrap:wrap}
+#code-cols button{width:44px;height:44px;border-radius:50%;border:3px solid var(--line)}
+#code-cols button[aria-pressed="true"]{outline:4px solid var(--fg);outline-offset:1px}
+#code-msg{margin:0;min-height:2.6em;font-size:1.2rem;text-align:center}
+#code-msg.ok{color:#2e7d32}
+@media (max-width:600px){.cl{font-size:1.05rem;gap:3px}.cl .st{width:36px;height:36px}.cl .chip{width:28px;height:28px}#code-mission svg{width:110px;height:110px}}
 @media (prefers-reduced-motion:reduce){#turn .turn-arrow{animation:none}}
 </style>
 
@@ -424,6 +462,39 @@ body.assessing #left-pixels h2:nth-of-type(3),body.assessing #left-pixels .grid:
   </div>
 </div>
 
+<div id="code" hidden>
+  <div class="code-top">
+    <h2>Code a picture</h2>
+    <div class="row">
+      <button class="pill" id="code-say" hidden>Read to me</button>
+      <button class="pill" id="code-home">Home</button>
+    </div>
+  </div>
+  <div class="row chips" id="code-chips" role="group" aria-label="Choose a mission"></div>
+  <div class="row chips" id="code-temps" role="group" aria-label="Start from a template"></div>
+  <div id="code-mission" hidden>
+    <svg id="code-target" viewBox="-1.1 -0.2 11.6 11.6" aria-label="The picture to make"></svg>
+    <div><b id="code-mtitle"></b><p id="code-mtext"></p></div>
+  </div>
+  <div class="code-body">
+    <div class="code-left">
+      <svg id="code-grid" viewBox="-1.1 -0.2 11.6 11.6" aria-label="Pixel grid with numbers"></svg>
+      <p class="code-hint">x goes across. y goes up. Say across first, then up.</p>
+    </div>
+    <div class="code-right">
+      <div id="code-list"></div>
+      <div class="row"><button class="pill" id="code-add">Add a line</button><button class="pill" id="code-clear">Start again</button></div>
+      <div id="code-cols" aria-label="Colours"></div>
+      <div class="row">
+        <button class="pill go" id="code-run">Run</button>
+        <button class="pill" id="code-step">Step</button>
+        <button class="pill" id="code-wipe">Wipe picture</button>
+      </div>
+      <p id="code-msg" aria-live="polite"></p>
+    </div>
+  </div>
+</div>
+
 <div id="mixer" hidden>
   <div class="sheet" role="dialog" aria-labelledby="mix-title">
     <h2 id="mix-title">Mix your paint</h2>
@@ -561,7 +632,10 @@ const PT=[
  ['India',['........','OOOOOOOO','OOOOOOOO','WWWBBWWW','WWWBBWWW','DDDDDDDD','DDDDDDDD','........']],
  ['China',['........','RYYRRRRR','RYYRRRRR','RRRRRRRR','RRRRRRRR','RRRRRRRR','RRRRRRRR','........']],
  ['Italy',['........','DDDWWRRR','DDDWWRRR','DDDWWRRR','DDDWWRRR','DDDWWRRR','DDDWWRRR','........']],
- ['Ireland',['........','DDDWWOOO','DDDWWOOO','DDDWWOOO','DDDWWOOO','DDDWWOOO','DDDWWOOO','........']]
+ ['Ireland',['........','DDDWWOOO','DDDWWOOO','DDDWWOOO','DDDWWOOO','DDDWWOOO','DDDWWOOO','........']],
+ ['Pumpkin',['................', '......DDDD......', '......DDDD......', '....OOODDOOO....', '..OOOOOOOOOOOO..', '.OOOOOOOOOOOOOO.', '.OOOXOOOOOOXOOO.', '.OOXXXOOOOXXXOO.', '.OOOOOOXXOOOOOO.', '.OXOOOOOOOOOOXO.', '.OOXXOXXXXOXXOO.', '.OOOOXXXXXXOOOO.', '.OOOOOOOOOOOOOO.', '..OOOOOOOOOOOO..', '....OOOOOOOO....', '................'],'s'],
+ ['Ghost',['................', '.....XXXXXX.....', '...XXWWWWWWXX...', '..XWWWWWWWWWWX..', '.XWWWWWWWWWWWWX.', '.XWWXXWWWWXXWWX.', '.XWWXXWWWWXXWWX.', '.XWKWWWWWWWWKWX.', '.XWWWWXXXXWWWWX.', '.XWWWWWXXWWWWWX.', '.XWWWWWWWWWWWWX.', '.XWWWWWWWWWWWWX.', '.XWWWWWWWWWWWWX.', '.XWWWWWWWWWWWWX.', '.XWWWXWWWWXWWWX.', '..XXX.XXXX.XXX..'],'s'],
+ ['Bat',['................', '................', '................', '................', '.....X....X.....', '.....XX..XX.....', 'X....XXXXXX....X', 'XX..XXRXXRXX..XX', 'XXX.XXXXXXXX.XXX', 'XXXXXXWXXWXXXXXX', 'X.XX.XXXXXX.XX.X', '..X...XXXX...X..', '.....XXXXXX.....', '................', '................', '................'],'s']
 ];
 let guideS=0, guideP=0, showGuide=true;
 const shapeTag=(a,extra)=>'<g transform="translate('+a[1]+' '+a[2]+') rotate('+a[4]+') scale('+a[3]+')" fill="'+PAL[a[5]]+'" '+extra+'>'+LIB[a[0]].d.replace('/>',' vector-effect="non-scaling-stroke"/>')+'</g>';
@@ -650,7 +724,7 @@ function guideAt(i){
   if(!showGuide)return null;
   if(selfie&&N===SN)return selfie[i];
   if(guideP<0)return null;
-  const c=PT[guideP][1][Math.floor(Math.floor(i/N)*8/N)][Math.floor((i%N)*8/N)];
+  const R=PT[guideP][1],rr=R.length,c=R[Math.floor(Math.floor(i/N)*rr/N)][Math.floor((i%N)*rr/N)];
   return c==='.'?null:(c==='W'?'#9aa6b2':PAL[c]);
 }
 function drawPixels(){
@@ -683,7 +757,7 @@ cv.addEventListener('pointerup',()=>painting=false);cv.addEventListener('pointer
 function setTool(t){ptool=t;['pencil','fill','rubber'].forEach(k=>$('pt-'+k).setAttribute('aria-pressed',k===t));}
 ['pencil','fill','rubber'].forEach(k=>$('pt-'+k).onclick=()=>setTool(k));
 function gridButtons(){$('grid-8').setAttribute('aria-pressed',N===8);$('grid-16').setAttribute('aria-pressed',N===16);}
-function setGrid(n){if(n===N)return;saveP();N=n;cells=new Array(n*n).fill(null);gridButtons();drawPixels();}
+function setGrid(n){if(n===N)return;saveP();N=n;if(n!==16&&guideP>=0&&PT[guideP][2]==='s')guideP=-1;cells=new Array(n*n).fill(null);gridButtons();drawPixels();}
 $('grid-8').onclick=()=>setGrid(8);$('grid-16').onclick=()=>setGrid(16);
 
 /* pen guides: line drawings to trace, on a 600 x 600 sheet */
@@ -746,7 +820,7 @@ const LETTERS='abcdefghijklmnopqrstuvwxyz'.split('').map(ch=>{
   return [ch,h,T(300,430,440,'#586a86')];
 });
 const PENL=DT.concat(LETTERS),PAINTL=DT.concat(PATS);
-const GROUPS={shapes:[[0,'Pictures'],[15,'Flags']],pixels:[[0,'Pictures'],[24,'Flags']],pen:[[0,'Pictures'],[DT.length,'Letters']],paint:[[0,'Pictures'],[DT.length,'Patterns']],patterns:[[0,'Patterns'],[12,'Trickier patterns']]};
+const GROUPS={shapes:[[0,'Pictures'],[15,'Flags']],pixels:[[0,'Pictures'],[24,'Flags'],[PT.length-3,'Halloween (small blocks)']],pen:[[0,'Pictures'],[DT.length,'Letters']],paint:[[0,'Pictures'],[DT.length,'Patterns']],patterns:[[0,'Patterns'],[12,'Trickier patterns']]};
 let guideD=-1;
 
 /* ---------- PEN MODE ---------- */
@@ -961,12 +1035,12 @@ function thumb(k){
   if(mode==='pen'||mode==='paint')return '<svg viewBox="0 0 600 600" fill="none" stroke="#586a86" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">'+((mode==='pen'?PENL:PAINTL)[k][2]||(mode==='pen'?PENL:PAINTL)[k][1])+'</svg>';
   if(mode==='shapes')return '<svg viewBox="0 0 600 600">'+ST[k][1].map(a=>shapeTag(a,'stroke="rgba(0,0,0,.3)" stroke-width="1"')).join('')+'</svg>';
   let r='';PT[k][1].forEach((row,y)=>row.split('').forEach((c,x)=>{if(c!=='.')r+='<rect x="'+x+'" y="'+y+'" width="1.02" height="1.02" fill="'+(c==='W'?'#e6ebf0':PAL[c])+'"/>';}));
-  return '<svg viewBox="-.5 -.5 9 9">'+r+'</svg>';
+  const sz=PT[k][1].length+1;return '<svg viewBox="-.5 -.5 '+sz+' '+sz+'">'+r+'</svg>';
 }
 function openPicker(){
   const list=mode==='shapes'?ST:mode==='pixels'?PT:mode==='pen'?PENL:mode==='paint'?PAINTL:FT,cur=mode==='shapes'?guideS:mode==='pixels'?guideP:mode==='pen'?guideD:mode==='paint'?guideC:patK;
   let h=mode==='patterns'?'':'<button class="tile" id="tile-free" data-k="-1" aria-pressed="'+(cur<0)+'">'+thumb(-1)+'Free draw</button>';
-  list.forEach((t,k)=>{const gh=GROUPS[mode].find(g=>g[0]===k);if(gh)h+='<h3>'+gh[1]+'</h3>';h+='<button class="tile" id="tile-'+k+'" data-k="'+k+'" aria-pressed="'+(cur===k)+'">'+thumb(k)+t[0]+'</button>';});
+  list.forEach((t,k)=>{if(mode==='pixels'&&t[2]==='s'&&N!==16)return;const gh=GROUPS[mode].find(g=>g[0]===k);if(gh)h+='<h3>'+gh[1]+'</h3>';h+='<button class="tile" id="tile-'+k+'" data-k="'+k+'" aria-pressed="'+(cur===k)+'">'+thumb(k)+t[0]+'</button>';});
   $('tiles').innerHTML=h;$('picker').hidden=false;
 }
 $('pictures').onclick=openPicker;
@@ -987,7 +1061,7 @@ $('undo').onclick=()=>{
   if(mode==='paint'){if(phist.length){phist.pop();drawPaint();}return;}
   if(mode==='patterns'){const u=undoF.pop();if(u){patK=u.k;if(u.all)patFill[u.k]=u.all;else(patFill[u.k]=patFill[u.k]||[])[u.i]=u.prev;renderPat();}return;}
   if(mode==='shapes'){if(!undoS.length)return;shapes=JSON.parse(undoS.pop());sel=-1;renderShapes();}
-  else{if(!undoP.length)return;const s=JSON.parse(undoP.pop());N=s.N;cells=s.cells;gridButtons();drawPixels();}
+  else{if(!undoP.length)return;const s=JSON.parse(undoP.pop());N=s.N;cells=s.cells;if(N!==16&&guideP>=0&&PT[guideP][2]==='s')guideP=-1;gridButtons();drawPixels();}
 };
 let clearTimer=null;
 function resetClear(){clearTimeout(clearTimer);clearTimer=null;$('clear').classList.remove('warn');$('clear-label').textContent='Start again';}
@@ -1015,16 +1089,18 @@ const ART={
   paint:'<svg viewBox="0 0 600 600"><g style="mix-blend-mode:multiply"><circle cx="230" cy="240" r="150" fill="#fdd835" opacity=".75"/></g><g style="mix-blend-mode:multiply"><circle cx="370" cy="240" r="150" fill="#4fc3f7" opacity=".75"/></g><g style="mix-blend-mode:multiply"><circle cx="300" cy="370" r="150" fill="#f48fb1" opacity=".75"/></g></svg>',
   patterns:(()=>{const cols=['#e53935','#fdd835','#1e63d0','#7cb342','#fb8c00','#8e44ad'];return '<svg viewBox="0 0 600 600" stroke="#1c2a44" stroke-width="4" stroke-linejoin="round">'+FT[0][1].map((e,i)=>e+' fill="'+(i===0?'#ffffff':i>60?cols[0]:i>40?cols[1]:i>24?cols[2]:i>12?cols[3]:i>4?cols[4]:cols[5])+'"/>').join('')+'</svg>';})()
 };
+ART.code=(()=>{const c={'2,2':'#e53935','3,3':'#e53935','4,4':'#e53935','5,5':'#e53935','2,5':'#1e63d0','5,2':'#7cb342','3,5':'#fdd835'};let r='';for(let y=0;y<5;y++)for(let x=0;x<5;x++){r+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+(c[(x+1)+','+(5-y)]||'#ffffff')+'" stroke="#cfd8e0" stroke-width=".06"/>';}for(let i=0;i<5;i++){r+='<text x="'+(i+.5)+'" y="5.7" font-size=".6" text-anchor="middle" fill="#586a86" font-family="Baloo 2,sans-serif">'+(i+1)+'</text><text x="-.35" y="'+(4.75-i)+'" font-size=".6" text-anchor="middle" fill="#586a86" font-family="Baloo 2,sans-serif">'+(i+1)+'</text>';}return '<svg viewBox="-.8 -.2 6.4 6.4">'+r+'</svg>';})();
 (function buildHome(){
   let h='';
   MODES.forEach(k=>{h+='<button class="card" id="mode-'+k+'">'+ART[k]+INFO[k][0]+'</button>';});
+  h+='<button class="card" id="home-code">'+ART.code+'Code</button>';
   h+='<button class="card" id="home-challenge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.2 6-5.500-3-5.500 3 1.200-6L3.200 9.400l6.100-.8z"/></svg>Challenge</button>';
   h+='<button class="card" id="home-assess"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM8.500 13l2.500 2.500 4.500-5"/></svg>Assessment</button>';
   $('cards').innerHTML=h;
 })();
 function view(work){document.body.classList.toggle('at-home',!work);$('home').hidden=work;$('bar').hidden=!work;$('work').hidden=!work;}
 function closeChallenge(){stopSpeech();$('challenge').hidden=true;$('challenge-btn').setAttribute('aria-pressed','false');}
-function goHome(){camClose();selfie=null;endAssess();$('asresult').hidden=true;$('asmenu').hidden=true;closeChallenge();$('intro').hidden=true;$('mixer').hidden=true;stopSpeech();view(false);}
+function goHome(){codeClose();camClose();selfie=null;endAssess();$('asresult').hidden=true;$('asmenu').hidden=true;closeChallenge();$('intro').hidden=true;$('mixer').hidden=true;stopSpeech();view(false);}
 function openTool(k){
   closeChallenge();view(true);setMode(k);
   $('intro-art').innerHTML=ART[k];$('intro-name').textContent=INFO[k][0];$('intro-text').textContent=INFO[k][1];
@@ -1429,10 +1505,141 @@ $('cam-use').onclick=()=>{
   saveP();selfie=camCells;camCells=null;N=SN;cells=new Array(SN*SN).fill(null);gridButtons();guideP=-1;showGuide=true;
   camStop();$('cam').hidden=true;refresh();
 };
+/* ---------- CODE A PICTURE: each line of code paints one square, found with two numbers. Nothing is saved or sent. ---------- */
+const GN=10;/* the coding grid is 10 x 10 */
+const CM=[
+ ['Red dot','Paint the red square. Read along to find x, then up to find y.',[[3,5,'R']]],
+ ['Blue line','Make the blue line. What stays the same? What changes?',[[1,1,'B'],[2,1,'B'],[3,1,'B'],[4,1,'B'],[5,1,'B']]],
+ ['Stairs','Make the green stairs. Look at both numbers each time.',[[1,1,'G'],[2,2,'G'],[3,3,'G'],[4,4,'G'],[5,5,'G']]],
+ ['Traffic light','Make the traffic light. Which colour is on top?',[[5,8,'R'],[5,7,'Y'],[5,6,'G']]],
+ ['Smile','Make the smiling face. Two eyes and a mouth. It takes 8 lines.',[[4,7,'X'],[7,7,'X'],[3,5,'X'],[8,5,'X'],[4,4,'X'],[7,4,'X'],[5,3,'X'],[6,3,'X']]]
+];
+const CT=[
+ ['Four corners','Four squares, one in each corner. Run it. Then change the colours.',(()=>[[1,1,0],[10,1,6],[1,10,2],[10,10,3]])()],
+ ['Diagonal','A line of squares going up. Look at the x and y numbers. What do you notice?',(()=>{const a=[];for(let i=1;i<=10;i++)a.push([i,i,7]);return a;})()],
+ ['Smile','A face with eyes and a smile. Can you add a nose? Can you change the colour?',[[4,7,10],[7,7,10],[3,5,10],[8,5,10],[4,4,10],[7,4,10],[5,3,10],[6,3,10]]],
+ ['Tree','A tree. The green is made of lots of squares. Can you make it taller?',(()=>{const a=[];[[9,5,6],[8,4,7],[7,3,8],[6,2,9]].forEach(([y,x0,x1])=>{for(let x=x0;x<=x1;x++)a.push([x,y,4]);});[[5,5],[5,6],[4,5],[4,6],[3,5],[3,6]].forEach(([y,x])=>a.push([x,y,9]));return a;})()]
+];
+let cprog=[{x:3,y:5,c:0}],csel=0,cpic=new Array(GN*GN).fill(null),cmis=-1,crun=-1,ctimer=null,cdiff=[],cclear=null;
+const WHITE='#ffffff',cidx=(x,y)=>(GN-y)*GN+(x-1);
+function cgridSvg(pic,opts){
+  opts=opts||{};let h='';
+  for(let y=GN;y>=1;y--)for(let x=1;x<=GN;x++){const col=pic[cidx(x,y)];h+='<rect x="'+(x-1)+'" y="'+(GN-y)+'" width="1" height="1" fill="'+(col||'#ffffff')+'" stroke="#cfd8e0" stroke-width=".05"/>';}
+  for(let i=1;i<=GN;i++){
+    h+='<text x="'+(i-.5)+'" y="'+(GN+.62)+'" text-anchor="middle" font-size=".55" fill="#586a86" font-family="Baloo 2,Nunito,sans-serif" font-weight="700">'+i+'</text>';
+    h+='<text x="-.5" y="'+(GN-i+.7)+'" text-anchor="middle" font-size=".55" fill="#586a86" font-family="Baloo 2,Nunito,sans-serif" font-weight="700">'+i+'</text>';
+  }
+  h+='<text x="'+(GN/2-.5)+'" y="'+(GN+1.25)+'" text-anchor="middle" font-size=".42" fill="#586a86" font-family="Nunito,sans-serif" font-weight="800">x</text>';
+  h+='<text x="-.92" y="'+(GN/2+.2)+'" text-anchor="middle" font-size=".42" fill="#586a86" font-family="Nunito,sans-serif" font-weight="800">y</text>';
+  return h+(opts.extra||'');
+}
+function cdraw(){
+  let ex='';
+  cdiff.forEach(i=>{ex+='<rect x="'+(i%GN+.07)+'" y="'+(Math.floor(i/GN)+.07)+'" width=".86" height=".86" fill="none" stroke="#d8433b" stroke-width=".1" stroke-dasharray=".2 .15"/>';});
+  const L=cprog[crun>=0?crun:csel];
+  if(L)ex+='<rect x="'+(L.x-1+.05)+'" y="'+(GN-L.y+.05)+'" width=".9" height=".9" fill="none" stroke="#1c2a44" stroke-width=".1" rx=".12"/><rect x="'+(L.x-1+.05)+'" y="'+(GN-L.y+.05)+'" width=".9" height=".9" fill="none" stroke="#ffc83d" stroke-width=".05" rx=".12"/>';
+  $('code-grid').innerHTML=cgridSvg(cpic,{extra:ex});
+}
+function clist(){
+  let h='';
+  cprog.forEach((l,i)=>{
+    h+='<div class="cl'+(i===crun?' now':'')+'" data-i="'+i+'" aria-current="'+(i===csel)+'"><span class="n">'+(i+1)+'</span><span class="w">Paint</span>'+
+      '<span class="ax">x</span><button class="st" data-a="x-" aria-label="x down">&minus;</button><span class="val">'+l.x+'</span><button class="st" data-a="x+" aria-label="x up">+</button>'+
+      '<span class="ax">y</span><button class="st" data-a="y-" aria-label="y down">&minus;</button><span class="val">'+l.y+'</span><button class="st" data-a="y+" aria-label="y up">+</button>'+
+      '<span class="chip" style="background:'+COLOURS[l.c][1]+'" title="'+COLOURS[l.c][0]+'"></span><button class="del" data-a="del" aria-label="Delete line '+(i+1)+'">&#10005;</button></div>';
+  });
+  $('code-list').innerHTML=h||'<p class="code-hint">No lines yet. Press Add a line.</p>';
+  document.querySelectorAll('#code-cols button').forEach((b,k)=>b.setAttribute('aria-pressed',cprog[csel]?cprog[csel].c===k:false));
+}
+function cmsg(t,ok){$('code-msg').textContent=t;$('code-msg').className=ok?'ok':'';}
+function cstop(){if(ctimer){clearTimeout(ctimer);ctimer=null;}crun=-1;$('code-run').textContent='Run';$('code-run').classList.remove('run');}
+function cwipe(){cstop();cpic=new Array(GN*GN).fill(null);cdiff=[];}
+function ctarget(){const t=new Array(GN*GN).fill(null);CM[cmis][2].forEach(([x,y,c])=>{t[cidx(x,y)]=PAL[c];});return t;}
+function ccheck(){
+  if(cmis<0){cmsg('Your code made a picture. The computer followed every line, in order.',true);return;}
+  const t=ctarget();cdiff=[];
+  for(let i=0;i<GN*GN;i++)if((t[i]||WHITE)!==(cpic[i]||WHITE))cdiff.push(i);
+  if(!cdiff.length)cmsg('Well done! Your code made the picture.',true);
+  else cmsg('Nearly. '+cdiff.length+' square'+(cdiff.length>1?'s are':' is')+' not right. The red dashes show where. Check the numbers.');
+  cdraw();
+}
+function cdo(i){const l=cprog[i];cpic[cidx(l.x,l.y)]=COLOURS[l.c][1];}
+function crunTick(){
+  if(crun>=cprog.length){const n=cprog.length;cstop();clist();cdraw();ccheck();return;}
+  cdo(crun);clist();cdraw();cmsg('Line '+(crun+1)+' of '+cprog.length);
+  crun++;ctimer=setTimeout(crunTick,450);
+}
+function crunStart(){
+  if(ctimer){cstop();clist();cdraw();cmsg('Stopped.');return;}
+  if(!cprog.length){cmsg('Add a line of code first.');return;}
+  cwipe();crun=0;$('code-run').textContent='Stop';$('code-run').classList.add('run');crunTick();
+}
+let cstepI=0;
+function cstepGo(){
+  if(ctimer)cstop();
+  if(!cprog.length){cmsg('Add a line of code first.');return;}
+  if(cstepI===0||cstepI>=cprog.length){cwipe();cstepI=0;}
+  crun=-1;cdo(cstepI);csel=cstepI;cstepI++;clist();cdraw();
+  if(cstepI>=cprog.length){ccheck();cstepI=0;}else cmsg('Line '+cstepI+' done. Press Step for the next line.');
+}
+function cmission(k){
+  cstop();cwipe();cstepI=0;cmis=k;cprog=[{x:1,y:1,c:0}];csel=0;
+  document.querySelectorAll('#code-chips button').forEach((b,i)=>b.setAttribute('aria-pressed',i===k+1));
+  document.querySelectorAll('#code-temps button').forEach(b=>b.setAttribute('aria-pressed','false'));
+  $('code-mission').hidden=k<0;
+  if(k>=0){const t=ctarget();$('code-target').innerHTML=cgridSvg(t);$('code-mtitle').textContent=CM[k][0];$('code-mtext').textContent=CM[k][1];}
+  cmsg(k<0?'Code is a list of instructions. The computer does them in order, from the top.':'Write the code, then press Run.');
+  clist();cdraw();
+}
+function ctemplate(k){
+  cmission(-1);cprog=CT[k][2].map(([x,y,c])=>({x,y,c}));csel=0;
+  document.querySelectorAll('#code-temps button').forEach((b,i)=>b.setAttribute('aria-pressed',i===k));
+  cmsg(CT[k][0]+'. '+CT[k][1]+' Press Run to watch it.');clist();cdraw();
+}
+function cedit(fn){if(ctimer){cstop();}cdiff=[];fn();clist();cdraw();}
+(function codeInit(){
+  let c='<button data-k="-1" aria-pressed="true">Free play</button>';CM.forEach((m,i)=>{c+='<button data-k="'+i+'" aria-pressed="false">'+(i+1)+'. '+m[0]+'</button>';});
+  $('code-chips').innerHTML=c;
+  $('code-temps').innerHTML='<span class="code-hint" style="margin:0 4px 0 0">Templates:</span>'+CT.map((t,i)=>'<button data-k="'+i+'" aria-pressed="false">'+t[0]+'</button>').join('');
+  $('code-temps').onclick=e=>{const b=e.target.closest('button');if(!b)return;ctemplate(+b.dataset.k);};
+  $('code-chips').onclick=e=>{const b=e.target.closest('button');if(b)cmission(+b.dataset.k);};
+  $('code-cols').innerHTML=COLOURS.map((c,k)=>'<button data-k="'+k+'" style="background:'+c[1]+'" aria-label="'+c[0]+'" aria-pressed="false"></button>').join('');
+  $('code-cols').onclick=e=>{const b=e.target.closest('button');if(!b)return;cedit(()=>{if(!cprog[csel])cprog.push({x:1,y:1,c:0}),csel=cprog.length-1;cprog[csel].c=+b.dataset.k;});};
+  $('code-list').onclick=e=>{
+    const row=e.target.closest('.cl');if(!row)return;const i=+row.dataset.i,b=e.target.closest('button');
+    cedit(()=>{
+      csel=i;if(!b)return;const a=b.dataset.a,l=cprog[i];
+      if(a==='del'){cprog.splice(i,1);csel=Math.max(0,Math.min(csel,cprog.length-1));}
+      else if(a==='x-')l.x=Math.max(1,l.x-1);else if(a==='x+')l.x=Math.min(GN,l.x+1);
+      else if(a==='y-')l.y=Math.max(1,l.y-1);else if(a==='y+')l.y=Math.min(GN,l.y+1);
+    });
+  };
+  $('code-grid').addEventListener('pointerdown',e=>{
+    const r=$('code-grid').getBoundingClientRect(),x=Math.floor((e.clientX-r.left)/r.width*11.6-1.1)+1,y=GN-Math.floor((e.clientY-r.top)/r.height*11.6-.2);
+    if(x<1||x>GN||y<1||y>GN)return;
+    cedit(()=>{if(!cprog[csel]){cprog.push({x:1,y:1,c:0});csel=cprog.length-1;}cprog[csel].x=x;cprog[csel].y=y;});
+  });
+  $('code-add').onclick=()=>cedit(()=>{if(cprog.length>=60){cmsg('That is a lot of lines! Run it first.');return;}const p=cprog[cprog.length-1]||{x:1,y:1,c:0};cprog.push({x:p.x,y:p.y,c:p.c});csel=cprog.length-1;});
+  $('code-clear').onclick=()=>{
+    if(cclear){clearTimeout(cclear);cclear=null;$('code-clear').classList.remove('warn');$('code-clear').textContent='Start again';cmission(cmis);return;}
+    $('code-clear').classList.add('warn');$('code-clear').textContent='Sure? Tap again';cclear=setTimeout(()=>{cclear=null;$('code-clear').classList.remove('warn');$('code-clear').textContent='Start again';},3000);
+  };
+  $('code-run').onclick=crunStart;$('code-step').onclick=cstepGo;
+  $('code-wipe').onclick=()=>{cwipe();cstepI=0;clist();cdraw();cmsg('The picture is clear. Your code is still here.');};
+  $('code-home').onclick=goHome;
+  $('code-say').hidden=!canSpeak;
+  $('code-say').onclick=()=>{
+    const lines=cprog.map((l,i)=>'Line '+(i+1)+'. Paint across '+l.x+', up '+l.y+', '+COLOURS[l.c][0].toLowerCase()+'.').join(' ');
+    say((cmis>=0?CM[cmis][0]+'. '+CM[cmis][1]+' ':'')+lines);
+  };
+})();
+function codeOpen(){closeChallenge();$('intro').hidden=true;$('code').hidden=false;$('code-home').hidden=locked;cmission(-1);}
+function codeClose(){cstop();$('code').hidden=true;}
+$('home-code').onclick=codeOpen;
 /* a link ending in #pixels, #shapes, #pen, #paint or #patterns opens on that tool, already locked */
 const startMode=(location.hash||'').slice(1).toLowerCase();
 const asHash=/^assess-(shapes|pixels|pen|paint)$/.exec(startMode);
-if(asHash){locked=true;asStart(asHash[1]);}else if(MODES.includes(startMode)){locked=true;openTool(startMode);}else{setMode('shapes');goHome();}
+if(asHash){locked=true;asStart(asHash[1]);}else if(startMode==='code'){locked=true;codeOpen();}else if(MODES.includes(startMode)){locked=true;openTool(startMode);}else{setMode('shapes');goHome();}
 })();
 </script>
 <script>
