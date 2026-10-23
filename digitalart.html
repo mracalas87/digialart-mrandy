@@ -179,9 +179,9 @@ input{-webkit-user-select:text;user-select:text}
   body.at-home footer img{width:70px;height:70px}
 }
 /* assessment mode */
-.cards{grid-template-rows:repeat(2,1fr) auto auto}
-@media (orientation:portrait),(max-width:820px){.cards{grid-template-rows:repeat(3,1fr) auto auto}}
-#home-challenge,#home-assess{grid-column:1/-1;flex-direction:row;justify-content:center;gap:16px;min-height:84px;background:#1c2a44;color:#ffc83d;padding:10px 20px}
+.cards{grid-template-rows:repeat(2,1fr) auto}
+@media (orientation:portrait),(max-width:820px){.cards{grid-template-rows:repeat(3,1fr) auto}}
+#home-challenge,#home-assess,#home-halloween{grid-column:1/-1;flex-direction:row;justify-content:center;gap:16px;min-height:84px;background:#1c2a44;color:#ffc83d;padding:10px 20px}
 #home-challenge svg,#home-assess svg{flex:none;width:52px;height:52px;background:transparent}
 #home-challenge{background:var(--accent);color:var(--accent-ink)}
 body.assessing #pictures,body.assessing #name-btn,body.assessing #guide,body.assessing #challenge-btn,body.assessing #lock{display:none}
@@ -243,6 +243,63 @@ body.assessing #left-pixels h2:nth-of-type(3),body.assessing #left-pixels .grid:
   #turn .turn-arrow{animation:nudge 2.4s ease-in-out infinite;transform-origin:50% 50%}
 }
 @keyframes nudge{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
+
+/* Halloween colour by cell: read the coordinates, colour the squares, find the mystery picture */
+#cbc{position:fixed;inset:0;z-index:10;background:var(--bg);overflow:auto;padding:12px 16px 20px;display:flex;flex-direction:column;gap:10px}
+#cbc[hidden]{display:none}
+#cbc .top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#cbc h2{font-family:var(--display);font-size:1.9rem;line-height:1;margin:0}
+#cbc .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
+#cbc .top h2{order:1}#cbc .top #cb-home{order:2}#cbc .top .seg{order:3;flex-basis:100%}
+body.cb-open #turn{display:none!important}
+
+#cbc .pill.go{background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-size:1.3rem}
+#cbc .seg button{min-height:44px;padding:0 16px;border-radius:999px;background:var(--panel);font-family:var(--display);font-size:1.15rem}
+#cbc .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.cb-body{display:flex;flex-direction:column;gap:12px;align-items:center}
+.cb-left{width:min(100%,520px);position:sticky;top:0;z-index:2;background:var(--bg);padding:4px 0}
+#cb-grid{width:100%;aspect-ratio:1;background:var(--panel);border-radius:16px;display:block;touch-action:none}
+#cb-msg{margin:6px 0 0;min-height:2.6em;font-size:1.15rem;text-align:center;line-height:1.25}
+#cb-msg.ok{color:#2e7d32}
+.cb-right{width:min(100%,680px);display:flex;flex-direction:column;gap:10px}
+#cb-now{margin:0 0 6px;text-align:center;font-family:var(--display);font-size:1.3rem;display:flex;align-items:center;justify-content:center;gap:8px}
+#cb-now i{width:30px;height:30px;border-radius:50%;border:3px solid var(--fg);display:inline-block}
+#cb-rub[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+#cb-acc{display:flex;flex-direction:column;gap:8px}
+.acc-h{display:flex;align-items:center;gap:10px;width:100%;min-height:58px;padding:0 14px 0 10px;border-radius:16px;background:var(--panel);font-family:var(--display);font-size:1.3rem;text-align:left;border:3px solid transparent}
+.acc-h i{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);flex:none}
+.acc-h small{font-family:var(--body);color:var(--muted);font-size:1rem;margin-left:auto}
+.acc-h .chev{font-size:1.2rem;color:var(--muted);transition:transform .15s}
+.acc-h[aria-expanded="true"]{border-color:var(--fg);border-radius:16px 16px 0 0}
+.acc-h[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.acc-b{background:var(--panel);border-radius:0 0 16px 16px;padding:10px;margin-top:-8px;border:3px solid var(--fg);border-top:0}
+.acc-b[hidden]{display:none}
+.acc-b p{margin:0 0 8px;font-size:1.05rem;color:var(--muted)}
+.acc-l{display:flex;flex-wrap:wrap;gap:6px}
+.acc-l button{min-width:86px;min-height:44px;border-radius:12px;background:var(--btn);font-family:var(--display);font-size:1.15rem;padding:0 10px}
+.acc-l button.ok{background:#d9f2d9;color:#1b5e20}
+.acc-l button.ok::after{content:" \2713"}
+#cb-ask{display:flex;flex-direction:column;align-items:center;gap:8px}
+#cb-ask p{margin:0;font-family:var(--display);font-size:1.4rem;text-align:center}
+#cb-ask button{min-height:48px;padding:0 20px;border-radius:999px;background:var(--panel);font-family:var(--display);font-size:1.2rem}
+#cb-ask button.good{background:#2e7d32;color:#fff}
+#cb-ask button.bad{background:var(--danger);color:#fff}
+#home-halloween{grid-column:1/-1;flex-direction:row;justify-content:center;gap:16px;min-height:84px;background:#1c1c1c;color:#f28c28;padding:10px 20px}
+#home-halloween svg{flex:none;width:56px;height:56px;background:transparent}
+/* landscape is allowed here: the grid sits on the left and the colour lists on the right */
+@media (orientation:landscape){
+  #cbc{padding:8px 14px 12px;gap:6px}
+  #cbc h2{font-size:1.4rem}
+  #cbc .top{flex-wrap:wrap;gap:6px 12px}
+  #cbc .top .seg{flex-basis:auto}
+  #cbc .top #cb-pic{order:3}#cbc .top #cb-lvl{order:4}#cbc .top #cb-home{order:5;margin-left:auto}
+  #cbc .seg button{min-height:40px;padding:0 12px;font-size:1.05rem}
+  .cb-body{flex-direction:row;align-items:flex-start;justify-content:center;gap:16px}
+  .cb-left{position:static;width:min(54vw,calc(100vh - 215px));flex:none;padding:0}
+  #cb-now{margin:0 0 4px;font-size:1.15rem}
+  #cb-msg{margin-top:4px;min-height:2.4em;font-size:1.05rem}
+  .cb-right{flex:1;min-width:0;max-height:calc(100vh - 80px);overflow-y:auto;padding-right:4px}
+}
 /* code a picture: a coding area where numbers and axes place the pixels */
 #code{position:fixed;inset:0;z-index:10;background:var(--bg);overflow:auto;padding:12px 16px 20px;display:flex;flex-direction:column;gap:10px}
 #code[hidden]{display:none}
@@ -461,6 +518,31 @@ body.assessing #left-pixels h2:nth-of-type(3),body.assessing #left-pixels .grid:
       <button class="pill" id="asr-again" hidden>Do it again</button>
       <button class="pill" id="asr-other">Another tool</button>
       <button class="pill go" id="asr-home">Home</button>
+    </div>
+  </div>
+</div>
+
+<div id="cbc" hidden>
+  <div class="top">
+    <h2>Halloween colour by cell</h2>
+    <div class="row seg" id="cb-pic" role="group" aria-label="Choose a mystery picture"></div>
+    <div class="row seg" id="cb-lvl" role="group" aria-label="Choose a level"></div>
+    <button class="pill" id="cb-home">Home</button>
+  </div>
+  <div class="cb-body">
+    <div class="cb-left">
+      <div class="row" id="cb-ctl">
+        <button class="pill go" id="cb-check">Check</button>
+        <button class="pill" id="cb-rub" aria-pressed="false">Rubber</button>
+        <button class="pill" id="cb-clear">Start again</button>
+      </div>
+      <p id="cb-now"></p>
+      <svg id="cb-grid" viewBox="-1.1 -0.2 13.6 13.6" aria-label="Colouring grid with numbers"></svg>
+      <p id="cb-msg" aria-live="polite"></p>
+    </div>
+    <div class="cb-right">
+      <div id="cb-ask" hidden></div>
+      <div id="cb-acc"></div>
     </div>
   </div>
 </div>
@@ -1100,24 +1182,23 @@ const ART={
   patterns:(()=>{const cols=['#e53935','#fdd835','#1e63d0','#7cb342','#fb8c00','#8e44ad'];return '<svg viewBox="0 0 600 600" stroke="#1c2a44" stroke-width="4" stroke-linejoin="round">'+FT[0][1].map((e,i)=>e+' fill="'+(i===0?'#ffffff':i>60?cols[0]:i>40?cols[1]:i>24?cols[2]:i>12?cols[3]:i>4?cols[4]:cols[5])+'"/>').join('')+'</svg>';})()
 };
 ART.code=(()=>{const c={'2,2':'#e53935','3,3':'#e53935','4,4':'#e53935','5,5':'#e53935','2,5':'#1e63d0','5,2':'#7cb342','3,5':'#fdd835'};let r='';for(let y=0;y<5;y++)for(let x=0;x<5;x++){r+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+(c[(x+1)+','+(5-y)]||'#ffffff')+'" stroke="#cfd8e0" stroke-width=".06"/>';}for(let i=0;i<5;i++){r+='<text x="'+(i+.5)+'" y="5.7" font-size=".6" text-anchor="middle" fill="#586a86" font-family="Baloo 2,sans-serif">'+(i+1)+'</text><text x="-.35" y="'+(4.75-i)+'" font-size=".6" text-anchor="middle" fill="#586a86" font-family="Baloo 2,sans-serif">'+(i+1)+'</text>';}return '<svg viewBox="-.8 -.2 6.4 6.4">'+r+'</svg>';})();
+const CBP_ART=(()=>{const rows=['.....NN.....','.....NN.GG..','..OOOOOOOO..','.OOOOOOOOOO.','OOOXOOOOXOOO','OOXXXOOXXXOO','OOOOOOOOOOOO','OOOOOXXOOOOO','OOXXXXXXXXOO','OOXXOXXOXXOO','.OOOOOOOOOO.','..OOOOOOOO..'],c={O:'#f28c28',N:'#8b5a2b',G:'#4caf50',X:'#222'};let r='';rows.forEach((row,y)=>row.split('').forEach((ch,x)=>{if(ch!=='.')r+='<rect x="'+x+'" y="'+y+'" width="1.02" height="1.02" fill="'+c[ch]+'"/>';}));return '<svg viewBox="-.3 -.3 12.6 12.6">'+r+'</svg>';})();
 (function buildHome(){
   let h='';
   MODES.forEach(k=>{h+='<button class="card" id="mode-'+k+'">'+ART[k]+INFO[k][0]+'</button>';});
   h+='<button class="card" id="home-code">'+ART.code+'Code</button>';
-  h+='<button class="card" id="home-challenge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.2 6-5.500-3-5.500 3 1.200-6L3.200 9.400l6.100-.8z"/></svg>Challenge</button>';
-  h+='<button class="card" id="home-assess"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM8.500 13l2.500 2.500 4.500-5"/></svg>Assessment</button>';
+  h+='<button class="card" id="home-halloween">'+CBP_ART+'Halloween: colour by cell</button>';
   $('cards').innerHTML=h;
 })();
 function view(work){document.body.classList.toggle('at-home',!work);$('home').hidden=work;$('bar').hidden=!work;$('work').hidden=!work;}
 function closeChallenge(){stopSpeech();$('challenge').hidden=true;$('challenge-btn').setAttribute('aria-pressed','false');}
-function goHome(){codeClose();camClose();selfie=null;endAssess();$('asresult').hidden=true;$('asmenu').hidden=true;closeChallenge();$('intro').hidden=true;$('mixer').hidden=true;stopSpeech();view(false);}
+function goHome(){cbcClose();codeClose();camClose();selfie=null;endAssess();$('asresult').hidden=true;$('asmenu').hidden=true;closeChallenge();$('intro').hidden=true;$('mixer').hidden=true;stopSpeech();view(false);}
 function openTool(k){
   closeChallenge();view(true);setMode(k);
   $('intro-art').innerHTML=ART[k];$('intro-name').textContent=INFO[k][0];$('intro-text').textContent=INFO[k][1];
   $('intro').hidden=false;
 }
 MODES.forEach(k=>$('mode-'+k).onclick=()=>openTool(k));
-$('home-challenge').onclick=()=>{view(true);newChallenge(true);};
 $('home-btn').onclick=goHome;
 $('intro-go').onclick=()=>{stopSpeech();$('intro').hidden=true;needMix();};
 $('intro-say').onclick=()=>say($('intro-text').textContent);
@@ -1441,7 +1522,6 @@ $('asr-copy').onclick=()=>{
 $('asr-again').onclick=()=>asStart(AS.tool);
 $('asr-other').onclick=asMenu;
 $('asr-home').onclick=goHome;
-$('home-assess').onclick=asMenu;
 $('asm-close').onclick=()=>{$('asmenu').hidden=true;};
 (function buildAsMenu(){
   $('as-tiles').innerHTML=['shapes','pixels','pen','paint'].map(k=>'<button class="as-tile" id="ast-'+k+'">'+ART[k]+AS_NAME[k]+'</button>').join('');
@@ -1515,6 +1595,108 @@ $('cam-use').onclick=()=>{
   saveP();selfie=camCells;camCells=null;N=SN;cells=new Array(SN*SN).fill(null);gridButtons();guideP=-1;showGuide=true;
   camStop();$('cam').hidden=true;refresh();
 };
+const CBP=[{'id':'pumpkin','name':'Pumpkin','easy':{'rows':['.....NN.....','.....NN.GG..','..OOOOOOOO..','.OOOOOOOOOO.','OOOXOOOOXOOO','OOXXXOOXXXOO','OOOOOOOOOOOO','OOOOOXXOOOOO','OOXXXXXXXXOO','OOXXOXXOXXOO','.OOOOOOOOOO.','..OOOOOOOO..'],'pal':[['O','Orange','#f28c28'],['N','Brown','#8b5a2b'],['G','Green','#4caf50'],['X','Black','#222222']]},'hard':{'rows':['.....NM.....','.....NM.JH..','..LOLLLODO..','.OODLLLODOD.','DOOXLLLOXODD','DOXXXLLXXXDD','DOODLLLODODD','DOODLXXODODD','DOXXXXXXXXDD','DOXXLXXOXXDD','.DDDOOODDDD.','..DDOOODDD..'],'pal':[['L','Light orange','#ffb454'],['O','Orange','#f28c28'],['D','Dark orange','#c8651b'],['N','Brown','#8b5a2b'],['M','Dark brown','#5e3a1a'],['J','Light green','#66bb6a'],['H','Dark green','#2e7d32'],['X','Black','#222222']]}},{'id':'ghost','name':'Ghost','easy':{'rows':['....BBBB....','...BBBBBB...','..BBBBBBBB..','.BBBBBBBBBB.','.BBXXBBXXBB.','.BBXXBBXXBB.','.BBBBBBBBBB.','.BKKBXXBKKB.','.BBBBXXBBBB.','.BBBBBBBBBB.','.BBBBBBBBBB.','.BB.BBBB.BB.'],'pal':[['B','Light blue','#bfe3ff'],['X','Black','#222222'],['K','Pink','#ff9ec4']]},'hard':{'rows':['....WWSD....','...WWBBSD...','..WBBBBBSD..','.WBBBBBBBSD.','.WBEXBBEXSD.','.WBXXBBXXSD.','.WBBBBBBBSD.','.WKQBXXBQQD.','.WBBBXXBBSD.','.WSSSSSSSSD.','.WDDDDDDDDD.','.WD.DDDD.DD.'],'pal':[['W','Very light blue','#eef8ff'],['B','Light blue','#bfe3ff'],['S','Blue','#9ccbf0'],['D','Dark blue','#6fa8dc'],['X','Black','#222222'],['E','Light grey','#d5dde5'],['K','Pink','#ff9ec4'],['Q','Dark pink','#e57fa6']]}},{'id':'monster','name':'Monster','easy':{'rows':['..X.X..X.X..','..XXXXXXXX..','..GGGGGGGG..','..GXXGGXXG..','..GWXGGXWG..','..GGGGGGGG..','YYGGGGGGGGYY','YYGGGGGGGGYY','..GGXXXXGG..','..GGGGGGGG..','....GGGG....','..PPPPPPPP..'],'pal':[['G','Green','#7bc67b'],['X','Black','#222222'],['W','White','#ffffff'],['Y','Grey','#b0b0b0'],['P','Purple','#9b6fd0']]},'hard':{'rows':['..X.X..X.X..','..TXXTXXTX..','..LLLLLLLD..','..LXXGGXXD..','..LWXGGXWD..','..LGGGGGGD..','UULGGGGGGDUU','YYLGGGGGGDYY','..LGXXXXGD..','..LGGDDDDD..','....DDDD....','..QQPPPPRR..'],'pal':[['L','Light green','#9ee09e'],['G','Green','#7bc67b'],['D','Dark green','#5aa75a'],['X','Black','#222222'],['T','Dark grey','#555555'],['W','White','#ffffff'],['U','Light grey','#cfcfcf'],['Y','Grey','#9a9a9a'],['Q','Light purple','#b58be0'],['P','Purple','#9b6fd0'],['R','Dark purple','#7c52b3']]}}];
+/* ---------- HALLOWEEN COLOUR BY CELL: each list gives the coordinates for one colour. Nothing is saved or sent. ---------- */
+const CBN=12,cbi=(x,y)=>(CBN-y)*CBN+(x-1);
+let cbOpen=true,cbPic=0,cbLvl='easy',cbSel=0,cbPaint=new Array(CBN*CBN).fill(null),cbMark=null,cbWrong=[],cbPaintingNow=false,cbLast=-1,cbClearT=null,cbSolved=false;
+const cbPal=()=>CBP[cbPic][cbLvl].pal,cbHex=l=>{const p=cbPal().find(q=>q[0]===l);return p?p[2]:'#ffffff';};
+function cbTarget(){const t=new Array(CBN*CBN).fill(null);CBP[cbPic][cbLvl].rows.forEach((row,r)=>row.split('').forEach((ch,c)=>{if(ch!=='.')t[r*CBN+c]=ch;}));return t;}
+function cbCoords(l){const out=[],t=cbTarget();for(let y=1;y<=CBN;y++)for(let x=1;x<=CBN;x++)if(t[cbi(x,y)]===l)out.push([x,y]);return out;}
+function cbDraw(){
+  let h='';
+  for(let y=CBN;y>=1;y--)for(let x=1;x<=CBN;x++){const l=cbPaint[cbi(x,y)];h+='<rect x="'+(x-1)+'" y="'+(CBN-y)+'" width="1" height="1" fill="'+(l?cbHex(l):'#ffffff')+'" stroke="#cfd8e0" stroke-width=".05"/>';}
+  for(let i=1;i<=CBN;i++){
+    h+='<text x="'+(i-.5)+'" y="'+(CBN+.62)+'" text-anchor="middle" font-size=".55" fill="#586a86" font-family="Baloo 2,Nunito,sans-serif" font-weight="700">'+i+'</text>';
+    h+='<text x="-.5" y="'+(CBN-i+.7)+'" text-anchor="middle" font-size=".55" fill="#586a86" font-family="Baloo 2,Nunito,sans-serif" font-weight="700">'+i+'</text>';
+  }
+  h+='<text x="'+(CBN/2-.5)+'" y="'+(CBN+1.25)+'" text-anchor="middle" font-size=".42" fill="#586a86" font-family="Nunito,sans-serif" font-weight="800">x</text>';
+  h+='<text x="-.92" y="'+(CBN/2+.2)+'" text-anchor="middle" font-size=".42" fill="#586a86" font-family="Nunito,sans-serif" font-weight="800">y</text>';
+  cbWrong.forEach(i=>{h+='<rect x="'+(i%CBN+.07)+'" y="'+(Math.floor(i/CBN)+.07)+'" width=".86" height=".86" fill="none" stroke="#d8433b" stroke-width=".1" stroke-dasharray=".2 .15"/>';});
+  if(cbMark)h+='<rect x="'+(cbMark[0]-1+.05)+'" y="'+(CBN-cbMark[1]+.05)+'" width=".9" height=".9" fill="none" stroke="#1c2a44" stroke-width=".1" rx=".12"/><rect x="'+(cbMark[0]-1+.05)+'" y="'+(CBN-cbMark[1]+.05)+'" width=".9" height=".9" fill="none" stroke="#ffc83d" stroke-width=".05" rx=".12"/>';
+  $('cb-grid').innerHTML=h;
+}
+function cbStats(){const t=cbTarget();let ok=0,tot=0,bad=0;t.forEach((l,i)=>{if(l){tot++;if(cbPaint[i]===l)ok++;}if(cbPaint[i]&&cbPaint[i]!==l)bad++;});return{ok,tot,bad};}
+function cbList(){
+  const p=cbPal(),t=cbTarget();let h='';
+  p.forEach(([l,name,hex],i)=>{
+    const co=cbCoords(l),open=cbSel===i&&cbOpen;
+    h+='<div class="acc" data-k="'+i+'"><button class="acc-h" data-k="'+i+'" aria-expanded="'+open+'"><i style="background:'+hex+'"></i><span>'+name+'</span><small id="acc-n-'+i+'"></small><span class="chev">&#9660;</span></button>'+
+       '<div class="acc-b" '+(open?'':'hidden')+'><p>Find each square on the grid: go across to x, then up to y.</p><div class="acc-l">'+
+       co.map(([x,y])=>'<button data-x="'+x+'" data-y="'+y+'">('+x+', '+y+')</button>').join('')+'</div></div></div>';
+  });
+  $('cb-acc').innerHTML=h;cbTicks();cbNow();
+}
+function cbTicks(){
+  const p=cbPal();
+  p.forEach(([l],i)=>{
+    const body=document.querySelector('.acc[data-k="'+i+'"] .acc-l');let ok=0,tot=0;
+    if(body)body.querySelectorAll('button').forEach(b=>{const good=cbPaint[cbi(+b.dataset.x,+b.dataset.y)]===l;b.classList.toggle('ok',good);tot++;if(good)ok++;});
+    const n=$('acc-n-'+i);if(n)n.textContent=ok+' of '+tot;
+  });
+}
+function cbNow(){
+  const p=cbPal();
+  $('cb-rub').setAttribute('aria-pressed',cbSel===-1);
+  $('cb-now').innerHTML=cbSel===-2?'Pick a colour below to start':cbSel===-1?'Rubber: tap a square to take its colour away':'Painting with <i style="background:'+p[cbSel][2]+'"></i>'+p[cbSel][1];
+}
+function cbMsg(t,ok){$('cb-msg').textContent=t;$('cb-msg').className=ok?'ok':'';}
+function cbProgress(){const s=cbStats();cbMsg(s.ok+' of '+s.tot+' squares are right.');}
+function cbNew(pic,lvl){
+  cbPic=pic;cbLvl=lvl;cbSel=-2;cbOpen=false;cbPaint=new Array(CBN*CBN).fill(null);cbMark=null;cbWrong=[];cbSolved=false;$('cb-ask').hidden=true;
+  document.querySelectorAll('#cb-pic button').forEach((b,i)=>b.setAttribute('aria-pressed',i===pic));
+  document.querySelectorAll('#cb-lvl button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===lvl));
+  cbList();cbDraw();
+  cbMsg(lvl==='easy'?'Tap a colour below to open its list of squares.':'Harder: the picture has shades. Read the colour names carefully.');
+}
+function cbPaintAt(e){
+  const r=$('cb-grid').getBoundingClientRect(),x=Math.floor((e.clientX-r.left)/r.width*13.6-1.1)+1,y=CBN-Math.floor((e.clientY-r.top)/r.height*13.6-.2);
+  if(x<1||x>CBN||y<1||y>CBN)return;
+  if(cbSel===-2){cbMsg('Tap a colour below first.');return;}
+  const i=cbi(x,y);if(i===cbLast)return;cbLast=i;
+  cbWrong=[];cbMark=null;cbPaint[i]=cbSel<0?null:cbPal()[cbSel][0];cbDraw();
+  cbTicks();
+  if(!cbSolved)cbProgress();
+}
+function cbCheck(){
+  const t=cbTarget();cbWrong=[];let miss=0;
+  t.forEach((l,i)=>{if(cbPaint[i]&&cbPaint[i]!==l)cbWrong.push(i);else if(l&&!cbPaint[i])miss++;});
+  cbDraw();
+  if(cbWrong.length){cbMsg(cbWrong.length+' square'+(cbWrong.length>1?'s have':' has')+' the wrong colour. The red dashes show where.'+(miss?' '+miss+' still to do.':''));return;}
+  if(miss){cbMsg('Everything so far is right. '+miss+' square'+(miss>1?'s':'')+' still to do.');return;}
+  cbSolved=true;cbMsg('Well done! Every square is right.',true);cbAsk();
+}
+function cbAsk(){
+  const opts=['Pumpkin','Ghost','Monster','Bat'],right=CBP[cbPic].name;
+  $('cb-ask').innerHTML='<p>The image is a(n) ...</p><div class="row">'+opts.map(o=>'<button data-o="'+o+'">'+o+'</button>').join('')+'</div>';
+  $('cb-ask').hidden=false;
+  $('cb-ask').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+    if(b.dataset.o===right){b.classList.add('good');cbMsg('Yes! It is a '+right.toLowerCase()+'. Brilliant colouring!',true);}
+    else{b.classList.add('bad');cbMsg('Not quite. Look at the picture again.');}};
+}
+(function cbcInit(){
+  $('cb-pic').innerHTML=CBP.map((p,i)=>'<button data-i="'+i+'" aria-pressed="false">Mystery '+(i+1)+'</button>').join('');
+  $('cb-lvl').innerHTML='<button data-l="easy" aria-pressed="true">Easy</button><button data-l="hard" aria-pressed="false">Harder: shades</button>';
+  $('cb-pic').onclick=e=>{const b=e.target.closest('button');if(b)cbNew(+b.dataset.i,cbLvl);};
+  $('cb-lvl').onclick=e=>{const b=e.target.closest('button');if(b)cbNew(cbPic,b.dataset.l);};
+  $('cb-acc').onclick=e=>{
+    const b=e.target.closest('button');if(!b)return;
+    if(b.classList.contains('acc-h')){const k=+b.dataset.k;cbOpen=!(cbSel===k&&cbOpen);cbSel=k;cbMark=null;cbList();cbDraw();return;}
+    cbMark=[+b.dataset.x,+b.dataset.y];cbDraw();
+  };
+  $('cb-rub').onclick=()=>{cbSel=cbSel===-1?-2:-1;cbOpen=false;cbMark=null;cbList();cbDraw();};
+  const g=$('cb-grid');
+  g.addEventListener('pointerdown',e=>{cbPaintingNow=true;cbLast=-1;try{g.setPointerCapture(e.pointerId);}catch(_){}cbPaintAt(e);e.preventDefault();});
+  g.addEventListener('pointermove',e=>{if(cbPaintingNow)cbPaintAt(e);});
+  ['pointerup','pointercancel'].forEach(ev=>g.addEventListener(ev,()=>{cbPaintingNow=false;cbLast=-1;}));
+  $('cb-check').onclick=cbCheck;
+  $('cb-clear').onclick=()=>{
+    if(cbClearT){clearTimeout(cbClearT);cbClearT=null;$('cb-clear').classList.remove('warn');$('cb-clear').textContent='Start again';cbNew(cbPic,cbLvl);return;}
+    $('cb-clear').classList.add('warn');$('cb-clear').textContent='Sure? Tap again';cbClearT=setTimeout(()=>{cbClearT=null;$('cb-clear').classList.remove('warn');$('cb-clear').textContent='Start again';},3000);
+  };
+  $('cb-home').onclick=goHome;
+})();
+function cbcOpen(){document.body.classList.add('cb-open');closeChallenge();$('intro').hidden=true;$('cbc').hidden=false;$('cb-home').hidden=locked;cbNew(0,'easy');}
+function cbcClose(){$('cbc').hidden=true;document.body.classList.remove('cb-open');}
 /* ---------- CODE A PICTURE: each line of code paints one square, found with two numbers. Nothing is saved or sent. ---------- */
 const GN=10;/* the coding grid is 10 x 10 */
 const CM=[];/* missions removed: the coding area uses templates and picture guides */
@@ -1662,10 +1844,11 @@ function cedit(fn){if(ctimer){cstop();}cdiff=[];fn();clist();cdraw();}
 function codeOpen(){closeChallenge();$('intro').hidden=true;$('code').hidden=false;$('code-home').hidden=locked;cmission(-1);}
 function codeClose(){cstop();$('code-pick').hidden=true;$('code').hidden=true;}
 $('home-code').onclick=codeOpen;
+$('home-halloween').onclick=cbcOpen;
 /* a link ending in #pixels, #shapes, #pen, #paint or #patterns opens on that tool, already locked */
 const startMode=(location.hash||'').slice(1).toLowerCase();
 const asHash=/^assess-(shapes|pixels|pen|paint)$/.exec(startMode);
-if(asHash){locked=true;asStart(asHash[1]);}else if(startMode==='code'){locked=true;codeOpen();}else if(MODES.includes(startMode)){locked=true;openTool(startMode);}else{setMode('shapes');goHome();}
+if(asHash){locked=true;asStart(asHash[1]);}else if(startMode==='code'){locked=true;codeOpen();}else if(startMode==='colourbycell'||startMode==='halloween'){locked=true;cbcOpen();}else if(MODES.includes(startMode)){locked=true;openTool(startMode);}else{setMode('shapes');goHome();}
 })();
 </script>
 <script>
