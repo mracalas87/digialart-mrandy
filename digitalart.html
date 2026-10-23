@@ -1649,11 +1649,18 @@ function cbNow(){
 }
 function cbMsg(t,ok){$('cb-msg').textContent=t;$('cb-msg').className=ok?'ok':'';}
 function cbProgress(){const s=cbStats();cbMsg(s.ok+' of '+s.tot+' squares are right.');}
-function cbNew(pic,lvl){
+const cbKey=()=>'cbc:'+cbPic+':'+cbLvl;
+function cbSave(){try{if(cbPaint.some(Boolean))localStorage.setItem(cbKey(),JSON.stringify(cbPaint));else localStorage.removeItem(cbKey());}catch(_){}}
+function cbLoad(){try{const s=JSON.parse(localStorage.getItem(cbKey())||'null'),ok=cbPal().map(p=>p[0]);
+  if(Array.isArray(s)&&s.length===cbN()*cbN()&&s.every(v=>v===null||ok.includes(v))&&s.some(Boolean)){cbPaint=s;return true;}}catch(_){}return false;}
+function cbNew(pic,lvl,fresh){
   cbPic=pic;cbLvl=lvl;cbSel=-2;cbOpen=false;cbPaint=new Array(cbN()*cbN()).fill(null);cbMark=null;cbWrong=[];cbSolved=false;$('cb-ask').hidden=true;
   document.querySelectorAll('#cb-pic button').forEach((b,i)=>b.setAttribute('aria-pressed',i===pic));
   document.querySelectorAll('#cb-lvl button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===lvl));
+  if(fresh){try{localStorage.removeItem(cbKey());}catch(_){}}
+  const back=!fresh&&cbLoad();
   cbList();cbDraw();
+  if(back){const s=cbStats();cbMsg('Welcome back! Your picture was saved. '+s.ok+' of '+s.tot+' squares are right.');return;}
   cbMsg(lvl==='num'?'Tap a colour below. Then find its numbers on the grid.':lvl==='easy'?'Tap a colour below to open its list of squares.':lvl==='hard'?'Harder: a bigger grid with shades. Read the colour names carefully.':'Extra hard: four quadrants. Watch for minus numbers!');
 }
 function cbPaintAt(e){
@@ -1662,7 +1669,7 @@ function cbPaintAt(e){
   if(cbSel===-2){cbMsg('Tap a colour below first.');return;}
   const i=rw*N+c;if(i===cbLast)return;cbLast=i;
   cbWrong=[];cbMark=null;cbPaint[i]=cbSel<0?null:cbPal()[cbSel][0];cbDraw();
-  cbTicks();
+  cbTicks();cbSave();
   if(!cbSolved)cbProgress();
 }
 function cbCheck(){
@@ -1698,7 +1705,7 @@ function cbAsk(){
   ['pointerup','pointercancel'].forEach(ev=>g.addEventListener(ev,()=>{cbPaintingNow=false;cbLast=-1;}));
   $('cb-check').onclick=cbCheck;
   $('cb-clear').onclick=()=>{
-    if(cbClearT){clearTimeout(cbClearT);cbClearT=null;$('cb-clear').classList.remove('warn');$('cb-clear').textContent='Start again';cbNew(cbPic,cbLvl);return;}
+    if(cbClearT){clearTimeout(cbClearT);cbClearT=null;$('cb-clear').classList.remove('warn');$('cb-clear').textContent='Start again';cbNew(cbPic,cbLvl,true);return;}
     $('cb-clear').classList.add('warn');$('cb-clear').textContent='Sure? Tap again';cbClearT=setTimeout(()=>{cbClearT=null;$('cb-clear').classList.remove('warn');$('cb-clear').textContent='Start again';},3000);
   };
   $('cb-home').onclick=goHome;
