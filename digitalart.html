@@ -524,7 +524,7 @@ body.cb-open #turn{display:none!important}
 
 <div id="cbc" hidden>
   <div class="top">
-    <h2>Halloween colour by cell</h2>
+    <h2>Colour by cell</h2>
     <div class="row seg" id="cb-pic" role="group" aria-label="Choose a mystery picture"></div>
     <div class="row seg" id="cb-lvl" role="group" aria-label="Choose a level"></div>
     <button class="pill" id="cb-home">Home</button>
@@ -1595,24 +1595,32 @@ $('cam-use').onclick=()=>{
   saveP();selfie=camCells;camCells=null;N=SN;cells=new Array(SN*SN).fill(null);gridButtons();guideP=-1;showGuide=true;
   camStop();$('cam').hidden=true;refresh();
 };
-const CBP=[{'id':'pumpkin','name':'Pumpkin','easy':{'rows':['.....NN.....','.....NN.GG..','..OOOOOOOO..','.OOOOOOOOOO.','OOOXOOOOXOOO','OOXXXOOXXXOO','OOOOOOOOOOOO','OOOOOXXOOOOO','OOXXXXXXXXOO','OOXXOXXOXXOO','.OOOOOOOOOO.','..OOOOOOOO..'],'pal':[['O','Orange','#f28c28'],['N','Brown','#8b5a2b'],['G','Green','#4caf50'],['X','Black','#222222']]},'hard':{'rows':['.....NM.....','.....NM.JH..','..LOLLLODO..','.OODLLLODOD.','DOOXLLLOXODD','DOXXXLLXXXDD','DOODLLLODODD','DOODLXXODODD','DOXXXXXXXXDD','DOXXLXXOXXDD','.DDDOOODDDD.','..DDOOODDD..'],'pal':[['L','Light orange','#ffb454'],['O','Orange','#f28c28'],['D','Dark orange','#c8651b'],['N','Brown','#8b5a2b'],['M','Dark brown','#5e3a1a'],['J','Light green','#66bb6a'],['H','Dark green','#2e7d32'],['X','Black','#222222']]}},{'id':'ghost','name':'Ghost','easy':{'rows':['....BBBB....','...BBBBBB...','..BBBBBBBB..','.BBBBBBBBBB.','.BBXXBBXXBB.','.BBXXBBXXBB.','.BBBBBBBBBB.','.BKKBXXBKKB.','.BBBBXXBBBB.','.BBBBBBBBBB.','.BBBBBBBBBB.','.BB.BBBB.BB.'],'pal':[['B','Light blue','#bfe3ff'],['X','Black','#222222'],['K','Pink','#ff9ec4']]},'hard':{'rows':['....WWSD....','...WWBBSD...','..WBBBBBSD..','.WBBBBBBBSD.','.WBEXBBEXSD.','.WBXXBBXXSD.','.WBBBBBBBSD.','.WKQBXXBQQD.','.WBBBXXBBSD.','.WSSSSSSSSD.','.WDDDDDDDDD.','.WD.DDDD.DD.'],'pal':[['W','Very light blue','#eef8ff'],['B','Light blue','#bfe3ff'],['S','Blue','#9ccbf0'],['D','Dark blue','#6fa8dc'],['X','Black','#222222'],['E','Light grey','#d5dde5'],['K','Pink','#ff9ec4'],['Q','Dark pink','#e57fa6']]}},{'id':'monster','name':'Monster','easy':{'rows':['..X.X..X.X..','..XXXXXXXX..','..GGGGGGGG..','..GXXGGXXG..','..GWXGGXWG..','..GGGGGGGG..','YYGGGGGGGGYY','YYGGGGGGGGYY','..GGXXXXGG..','..GGGGGGGG..','....GGGG....','..PPPPPPPP..'],'pal':[['G','Green','#7bc67b'],['X','Black','#222222'],['W','White','#ffffff'],['Y','Grey','#b0b0b0'],['P','Purple','#9b6fd0']]},'hard':{'rows':['..X.X..X.X..','..TXXTXXTX..','..LLLLLLLD..','..LXXGGXXD..','..LWXGGXWD..','..LGGGGGGD..','UULGGGGGGDUU','YYLGGGGGGDYY','..LGXXXXGD..','..LGGDDDDD..','....DDDD....','..QQPPPPRR..'],'pal':[['L','Light green','#9ee09e'],['G','Green','#7bc67b'],['D','Dark green','#5aa75a'],['X','Black','#222222'],['T','Dark grey','#555555'],['W','White','#ffffff'],['U','Light grey','#cfcfcf'],['Y','Grey','#9a9a9a'],['Q','Light purple','#b58be0'],['P','Purple','#9b6fd0'],['R','Dark purple','#7c52b3']]}}];
+const CBP=[{"id":"pumpkin","name":"Pumpkin","easy":{"rows":[".....NN.....",".....NN.GG..","..OOOOOOOO..",".OOOOOOOOOO.","OOOXOOOOXOOO","OOXXXOOXXXOO","OOOOOOOOOOOO","OOOOOXXOOOOO","OOXXXXXXXXOO","OOXXOXXOXXOO",".OOOOOOOOOO.","..OOOOOOOO.."],"pal":[["O","Orange","#f28c28"],["N","Brown","#8b5a2b"],["G","Green","#4caf50"],["X","Black","#222222"]]},"hard":{"rows":["................","........G.......",".......FGHHI....",".......CC.......","...CDDDDDCCCB...","..DDJEDEDDDJCB..",".EEEJJEEEDJJCCB.","CEEEEEEEEDDDDDCA","DEEEEEEEEDDDDDCA","DEEJJJJJJJJJJDCA","CEEJJJJJJJJJJCCA",".DEDEJJDDJJCCCB.",".CDDDDCCCCCCBBA.","...BCCBCBBBBA...","....A..AA..A....","................"],"pal":[["A","Darkest orange","#9a4a10"],["B","Dark orange","#c8651b"],["C","Orange","#f28c28"],["D","Light orange","#ffb454"],["E","Lightest orange","#ffd08a"],["F","Brown","#8b5a2b"],["G","Dark brown","#5e3a1a"],["H","Light green","#66bb6a"],["I","Dark green","#2e7d32"],["J","Black","#222222"]]},"quad":{"rows":["....................","..........GG........",".........FGHHII.....",".........FG.HI......","........CCCB........","....CDDCDDDCCCCB....","...CDJJDDDDDCJJCA...",".CDDEJJEEEEDDJJCCBA.",".DEEJJJJEEEDJJJJCCB.","CEEEEEEEEEEDDDDDDCCA","DEEEEEEEEEEDDDDDDDCA","DEEEJJJJJJJJJJJJDDCA","CEEEJJJJJJJJJJJJDCCA","CEEEEJJJDJJDJJJCCCBA",".DEEDEJJDJJCJJCCCCB.",".CDDDDDDCDCCCCCBBBA.","..BBCCCCCCCBBBBAAA..","....BBBBBBBAAAAA....",".........AA.........","...................."],"pal":[["A","Darkest orange","#9a4a10"],["B","Dark orange","#c8651b"],["C","Orange","#f28c28"],["D","Light orange","#ffb454"],["E","Lightest orange","#ffd08a"],["F","Brown","#8b5a2b"],["G","Dark brown","#5e3a1a"],["H","Light green","#66bb6a"],["I","Dark green","#2e7d32"],["J","Black","#222222"]]}},{"id":"ghost","name":"Ghost","easy":{"rows":["....BBBB....","...BBBBBB...","..BBBBBBBB..",".BBBBBBBBBB.",".BBXXBBXXBB.",".BBXXBBXXBB.",".BBBBBBBBBB.",".BKKBXXBKKB.",".BBBBXXBBBB.",".BBBBBBBBBB.",".BBBBBBBBBB.",".BB.BBBB.BB."],"pal":[["B","Light blue","#bfe3ff"],["X","Black","#222222"],["K","Pink","#ff9ec4"]]},"hard":{"rows":["................","......EEDD......","....EEEEDDDC....","....EEEDDDCC....","...EEEDDDDCCC...","...EEGDDDCFCB...","..EEDFFDCFFCBB..","..EEDFDCCCFBBB..","..EHHDCCCCBIIB..","..DDDDCFFBBBBA..","..DDDCCCBBBBAA..","..CCCBBBBAAAAA..","..CCBBBBAAAAAA..","...BBB.AA.AAA...","................","................"],"pal":[["A","Dark blue","#6fa8dc"],["B","Blue","#9ccbf0"],["C","Light blue","#bfe3ff"],["D","Very light blue","#dff1ff"],["E","Palest blue","#f4faff"],["F","Black","#222222"],["G","White","#ffffff"],["H","Pink","#ff9ec4"],["I","Dark pink","#e57fa6"]]},"quad":{"rows":["....................",".........EE.........","......EEEEDDDD......",".....EEEEDDDDDC.....","....EEEEDDDDDCCC....","....EEEEDDDDCCCC....","...EEEFFDDDCFFCCB...","...EEEGFDDDCGFCBB...","...EEDFFDDCCFFBBB...","...EEDFFDCCCFFBBB...","...EHHDDCCCCCBIIB...","...DHHDCCFFCBBIIA...","...DDDDCCFFBBBBAA...","...DDDCCCCBBBBBAA...","...CCCBBBBBAAAAAA...","...CCBBBBBAAAAAAA...","...CCBBBBAAAAAAAA...",".....B...AA...A.....","....................","...................."],"pal":[["A","Dark blue","#6fa8dc"],["B","Blue","#9ccbf0"],["C","Light blue","#bfe3ff"],["D","Very light blue","#dff1ff"],["E","Palest blue","#f4faff"],["F","Black","#222222"],["G","White","#ffffff"],["H","Pink","#ff9ec4"],["I","Dark pink","#e57fa6"]]}},{"id":"monster","name":"Monster","easy":{"rows":["..X.X..X.X..","..XXXXXXXX..","..GGGGGGGG..","..GXXGGXXG..","..GWXGGXWG..","..GGGGGGGG..","YYGGGGGGGGYY","YYGGGGGGGGYY","..GGXXXXGG..","..GGGGGGGG..","....GGGG....","..PPPPPPPP.."],"pal":[["G","Green","#7bc67b"],["X","Black","#222222"],["W","White","#ffffff"],["Y","Grey","#b0b0b0"],["P","Purple","#9b6fd0"]]},"hard":{"rows":["................","....H..HI..I....","....HIIHIIHI....","....EEDDDCCC....","....EFFDDFFC....","....EGGDCGGC....","....DGFDCFGB....",".JJJDDDCCCCBJJJ.",".KKKDDCBBCBBKKK.","....DDFFFFBB....","....BBBBAAAA....","......BBBB......","......BBBB......","...NNMMMMMMLL...","...NNMMMMMMLL...","................"],"pal":[["A","Darkest green","#468f46"],["B","Dark green","#5aa75a"],["C","Green","#7bc67b"],["D","Light green","#9ee09e"],["E","Lightest green","#c4f0c4"],["F","Black","#222222"],["G","White","#ffffff"],["H","Dark grey","#555555"],["I","Black hair","#2b2b2b"],["J","Grey","#9a9a9a"],["K","Light grey","#cfcfcf"],["L","Dark purple","#7c52b3"],["M","Purple","#9b6fd0"],["N","Light purple","#b58be0"]]},"quad":{"rows":["....................","....HHI..HI..HII....","....HHIIIHIIIHII....","....IIIIIIIIIIII....","....EECBBBBAAACC....","....EEDDDDDCCCCB....","....EEDDDDCCCCCB....","....EDGGFDCFGGBB....","....EDGGFCCFGGBB....","..JJDDDDDCCCCBBBJJ..","..KKDDDDCBBCCBBBKK..","....DDDDCCCCBBBB....","....CCBFFFFFFAAA....","....CBBBBBAAAAAA....","........BBBB........","........BBBB........","...NNNMMMMMMMMLLL...","...NNNMMMMMMMMLLL...","...NNNMMMMMMMMLLL...","...................."],"pal":[["A","Darkest green","#468f46"],["B","Dark green","#5aa75a"],["C","Green","#7bc67b"],["D","Light green","#9ee09e"],["E","Lightest green","#c4f0c4"],["F","Black","#222222"],["G","White","#ffffff"],["H","Dark grey","#555555"],["I","Black hair","#2b2b2b"],["J","Grey","#9a9a9a"],["K","Light grey","#cfcfcf"],["L","Dark purple","#7c52b3"],["M","Purple","#9b6fd0"],["N","Light purple","#b58be0"]]}}];
 /* ---------- HALLOWEEN COLOUR BY CELL: each list gives the coordinates for one colour. Nothing is saved or sent. ---------- */
-const CBN=12,cbi=(x,y)=>(CBN-y)*CBN+(x-1);
-let cbOpen=true,cbPic=0,cbLvl='easy',cbSel=0,cbPaint=new Array(CBN*CBN).fill(null),cbMark=null,cbWrong=[],cbPaintingNow=false,cbLast=-1,cbClearT=null,cbSolved=false;
-const cbPal=()=>CBP[cbPic][cbLvl].pal,cbHex=l=>{const p=cbPal().find(q=>q[0]===l);return p?p[2]:'#ffffff';};
-function cbTarget(){const t=new Array(CBN*CBN).fill(null);CBP[cbPic][cbLvl].rows.forEach((row,r)=>row.split('').forEach((ch,c)=>{if(ch!=='.')t[r*CBN+c]=ch;}));return t;}
-function cbCoords(l){const out=[],t=cbTarget();for(let y=1;y<=CBN;y++)for(let x=1;x<=CBN;x++)if(t[cbi(x,y)]===l)out.push([x,y]);return out;}
+let cbLvl='easy';
+const cbN=()=>cbLvl==='hard'?16:cbLvl==='quad'?20:12;
+const cbCol=x=>cbLvl==='quad'?(x<0?x+10:x+9):x-1,cbRow=y=>cbLvl==='quad'?(y>0?10-y:9-y):cbN()-y;
+const cbXv=c=>cbLvl==='quad'?(c<10?c-10:c-9):c+1,cbYv=r=>cbLvl==='quad'?(r<10?10-r:9-r):cbN()-r;
+const cbi=(x,y)=>cbRow(y)*cbN()+cbCol(x);
+const cbAxis=()=>{const a=[];for(let c=0;c<cbN();c++)a.push(cbXv(c));return a;};
+let cbOpen=true,cbPic=0,cbSel=0,cbPaint=new Array(400).fill(null),cbMark=null,cbWrong=[],cbPaintingNow=false,cbLast=-1,cbClearT=null,cbSolved=false;
+const cbVB=()=>cbLvl==='num'?{x:0,y:0,w:12}:{x:-1.3,y:-.2,w:cbN()+1.8},cbD=()=>CBP[cbPic][cbLvl==='num'?'easy':cbLvl],cbPal=()=>cbD().pal,cbHex=l=>{const p=cbPal().find(q=>q[0]===l);return p?p[2]:'#ffffff';};
+function cbTarget(){const N=cbN(),t=new Array(N*N).fill(null);cbD().rows.forEach((row,r)=>row.split('').forEach((ch,c)=>{if(ch!=='.')t[r*N+c]=ch;}));return t;}
+function cbCoords(l){const out=[],t=cbTarget(),N=cbN();for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(t[r*N+c]===l)out.push([cbXv(c),cbYv(r)]);return out;}
 function cbDraw(){
   let h='';
-  for(let y=CBN;y>=1;y--)for(let x=1;x<=CBN;x++){const l=cbPaint[cbi(x,y)];h+='<rect x="'+(x-1)+'" y="'+(CBN-y)+'" width="1" height="1" fill="'+(l?cbHex(l):'#ffffff')+'" stroke="#cfd8e0" stroke-width=".05"/>';}
-  for(let i=1;i<=CBN;i++){
-    h+='<text x="'+(i-.5)+'" y="'+(CBN+.62)+'" text-anchor="middle" font-size=".55" fill="#586a86" font-family="Baloo 2,Nunito,sans-serif" font-weight="700">'+i+'</text>';
-    h+='<text x="-.5" y="'+(CBN-i+.7)+'" text-anchor="middle" font-size=".55" fill="#586a86" font-family="Baloo 2,Nunito,sans-serif" font-weight="700">'+i+'</text>';
-  }
-  h+='<text x="'+(CBN/2-.5)+'" y="'+(CBN+1.25)+'" text-anchor="middle" font-size=".42" fill="#586a86" font-family="Nunito,sans-serif" font-weight="800">x</text>';
-  h+='<text x="-.92" y="'+(CBN/2+.2)+'" text-anchor="middle" font-size=".42" fill="#586a86" font-family="Nunito,sans-serif" font-weight="800">y</text>';
-  cbWrong.forEach(i=>{h+='<rect x="'+(i%CBN+.07)+'" y="'+(Math.floor(i/CBN)+.07)+'" width=".86" height=".86" fill="none" stroke="#d8433b" stroke-width=".1" stroke-dasharray=".2 .15"/>';});
-  if(cbMark)h+='<rect x="'+(cbMark[0]-1+.05)+'" y="'+(CBN-cbMark[1]+.05)+'" width=".9" height=".9" fill="none" stroke="#1c2a44" stroke-width=".1" rx=".12"/><rect x="'+(cbMark[0]-1+.05)+'" y="'+(CBN-cbMark[1]+.05)+'" width=".9" height=".9" fill="none" stroke="#ffc83d" stroke-width=".05" rx=".12"/>';
+  const num=cbLvl==='num',N=cbN(),q=cbLvl==='quad';
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){const l=cbPaint[r*N+c],hex=l?cbHex(l):'#ffffff';h+='<rect x="'+c+'" y="'+r+'" width="1" height="1" fill="'+hex+'" stroke="#cfd8e0" stroke-width=".05"/>';
+    if(num){const v=parseInt(hex.slice(1,3),16)*.3+parseInt(hex.slice(3,5),16)*.59+parseInt(hex.slice(5,7),16)*.11;h+='<text x="'+(c+.5)+'" y="'+(r+.64)+'" text-anchor="middle" font-size=".42" font-family="Baloo 2,Nunito,sans-serif" font-weight="700" fill="'+(v<110?'#ffffff':'#1c2a44')+'" opacity="'+(v<110?.5:.32)+'" pointer-events="none">'+(r*N+c+1)+'</text>';}}
+  if(!num){const fs=q?.5:.55;
+    for(let c=0;c<N;c++)h+='<text x="'+(c+.5)+'" y="'+(N+.62)+'" text-anchor="middle" font-size="'+fs+'" fill="#586a86" font-family="Baloo 2,Nunito,sans-serif" font-weight="700">'+cbXv(c)+'</text>';
+    for(let r=0;r<N;r++)h+='<text x="-.12" y="'+(r+.68)+'" text-anchor="end" font-size="'+fs+'" fill="#586a86" font-family="Baloo 2,Nunito,sans-serif" font-weight="700">'+cbYv(r)+'</text>';
+    h+='<text x="'+(N/2)+'" y="'+(N+1.3)+'" text-anchor="middle" font-size=".45" fill="#586a86" font-family="Nunito,sans-serif" font-weight="800">x</text>';
+    h+='<text x="-1.05" y="'+(N/2+.2)+'" text-anchor="middle" font-size=".45" fill="#586a86" font-family="Nunito,sans-serif" font-weight="800">y</text>';
+    if(q)h+='<line x1="10" y1="0" x2="10" y2="20" stroke="#1c2a44" stroke-width=".14" pointer-events="none"/><line x1="0" y1="10" x2="20" y2="10" stroke="#1c2a44" stroke-width=".14" pointer-events="none"/>';}
+  cbWrong.forEach(i=>{h+='<rect x="'+(i%N+.07)+'" y="'+(Math.floor(i/N)+.07)+'" width=".86" height=".86" fill="none" stroke="#d8433b" stroke-width=".1" stroke-dasharray=".2 .15"/>';});
+  if(cbMark){const mx=cbCol(cbMark[0]),my=cbRow(cbMark[1]);h+='<rect x="'+(mx+.05)+'" y="'+(my+.05)+'" width=".9" height=".9" fill="none" stroke="#1c2a44" stroke-width=".1" rx=".12"/><rect x="'+(mx+.05)+'" y="'+(my+.05)+'" width=".9" height=".9" fill="none" stroke="#ffc83d" stroke-width=".05" rx=".12"/>';}
+  const vb=cbVB();$('cb-grid').setAttribute('viewBox',vb.x+' '+vb.y+' '+vb.w+' '+vb.w);
   $('cb-grid').innerHTML=h;
 }
 function cbStats(){const t=cbTarget();let ok=0,tot=0,bad=0;t.forEach((l,i)=>{if(l){tot++;if(cbPaint[i]===l)ok++;}if(cbPaint[i]&&cbPaint[i]!==l)bad++;});return{ok,tot,bad};}
@@ -1621,8 +1629,8 @@ function cbList(){
   p.forEach(([l,name,hex],i)=>{
     const co=cbCoords(l),open=cbSel===i&&cbOpen;
     h+='<div class="acc" data-k="'+i+'"><button class="acc-h" data-k="'+i+'" aria-expanded="'+open+'"><i style="background:'+hex+'"></i><span>'+name+'</span><small id="acc-n-'+i+'"></small><span class="chev">&#9660;</span></button>'+
-       '<div class="acc-b" '+(open?'':'hidden')+'><p>Find each square on the grid: go across to x, then up to y.</p><div class="acc-l">'+
-       co.map(([x,y])=>'<button data-x="'+x+'" data-y="'+y+'">('+x+', '+y+')</button>').join('')+'</div></div></div>';
+       '<div class="acc-b" '+(open?'':'hidden')+'><p>'+(cbLvl==='num'?'Find each number on the grid, then tap that square.':cbLvl==='quad'?'Go across to x, then up or down to y. Minus numbers go left and down.':'Find each square on the grid: go across to x, then up to y.')+'</p><div class="acc-l">'+
+       (cbLvl==='num'?co.slice().sort((a,b)=>cbi(a[0],a[1])-cbi(b[0],b[1])):co).map(([x,y])=>'<button data-x="'+x+'" data-y="'+y+'">'+(cbLvl==='num'?(cbi(x,y)+1):'('+x+', '+y+')')+'</button>').join('')+'</div></div></div>';
   });
   $('cb-acc').innerHTML=h;cbTicks();cbNow();
 }
@@ -1642,17 +1650,17 @@ function cbNow(){
 function cbMsg(t,ok){$('cb-msg').textContent=t;$('cb-msg').className=ok?'ok':'';}
 function cbProgress(){const s=cbStats();cbMsg(s.ok+' of '+s.tot+' squares are right.');}
 function cbNew(pic,lvl){
-  cbPic=pic;cbLvl=lvl;cbSel=-2;cbOpen=false;cbPaint=new Array(CBN*CBN).fill(null);cbMark=null;cbWrong=[];cbSolved=false;$('cb-ask').hidden=true;
+  cbPic=pic;cbLvl=lvl;cbSel=-2;cbOpen=false;cbPaint=new Array(cbN()*cbN()).fill(null);cbMark=null;cbWrong=[];cbSolved=false;$('cb-ask').hidden=true;
   document.querySelectorAll('#cb-pic button').forEach((b,i)=>b.setAttribute('aria-pressed',i===pic));
   document.querySelectorAll('#cb-lvl button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===lvl));
   cbList();cbDraw();
-  cbMsg(lvl==='easy'?'Tap a colour below to open its list of squares.':'Harder: the picture has shades. Read the colour names carefully.');
+  cbMsg(lvl==='num'?'Tap a colour below. Then find its numbers on the grid.':lvl==='easy'?'Tap a colour below to open its list of squares.':lvl==='hard'?'Harder: a bigger grid with shades. Read the colour names carefully.':'Extra hard: four quadrants. Watch for minus numbers!');
 }
 function cbPaintAt(e){
-  const r=$('cb-grid').getBoundingClientRect(),x=Math.floor((e.clientX-r.left)/r.width*13.6-1.1)+1,y=CBN-Math.floor((e.clientY-r.top)/r.height*13.6-.2);
-  if(x<1||x>CBN||y<1||y>CBN)return;
+  const r=$('cb-grid').getBoundingClientRect(),vb=cbVB(),N=cbN(),c=Math.floor((e.clientX-r.left)/r.width*vb.w+vb.x),rw=Math.floor((e.clientY-r.top)/r.height*vb.w+vb.y);
+  if(c<0||c>=N||rw<0||rw>=N)return;
   if(cbSel===-2){cbMsg('Tap a colour below first.');return;}
-  const i=cbi(x,y);if(i===cbLast)return;cbLast=i;
+  const i=rw*N+c;if(i===cbLast)return;cbLast=i;
   cbWrong=[];cbMark=null;cbPaint[i]=cbSel<0?null:cbPal()[cbSel][0];cbDraw();
   cbTicks();
   if(!cbSolved)cbProgress();
@@ -1675,7 +1683,7 @@ function cbAsk(){
 }
 (function cbcInit(){
   $('cb-pic').innerHTML=CBP.map((p,i)=>'<button data-i="'+i+'" aria-pressed="false">Mystery '+(i+1)+'</button>').join('');
-  $('cb-lvl').innerHTML='<button data-l="easy" aria-pressed="true">Easy</button><button data-l="hard" aria-pressed="false">Harder: shades</button>';
+  $('cb-lvl').innerHTML='<button data-l="num" aria-pressed="false">Easiest</button><button data-l="easy" aria-pressed="true">Easy</button><button data-l="hard" aria-pressed="false">Harder</button><button data-l="quad" aria-pressed="false">Extra hard</button>';
   $('cb-pic').onclick=e=>{const b=e.target.closest('button');if(b)cbNew(+b.dataset.i,cbLvl);};
   $('cb-lvl').onclick=e=>{const b=e.target.closest('button');if(b)cbNew(cbPic,b.dataset.l);};
   $('cb-acc').onclick=e=>{
@@ -1695,7 +1703,7 @@ function cbAsk(){
   };
   $('cb-home').onclick=goHome;
 })();
-function cbcOpen(){document.body.classList.add('cb-open');closeChallenge();$('intro').hidden=true;$('cbc').hidden=false;$('cb-home').hidden=locked;cbNew(0,'easy');}
+function cbcOpen(){document.body.classList.add('cb-open');closeChallenge();$('intro').hidden=true;$('cbc').hidden=false;$('cb-home').hidden=locked;cbNew(0,'num');}
 function cbcClose(){$('cbc').hidden=true;document.body.classList.remove('cb-open');}
 /* ---------- CODE A PICTURE: each line of code paints one square, found with two numbers. Nothing is saved or sent. ---------- */
 const GN=10;/* the coding grid is 10 x 10 */
